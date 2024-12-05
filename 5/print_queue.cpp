@@ -92,7 +92,6 @@ auto is_page_in_correct_order(const Page &page, const Rules &rules) {
   for (auto page_iter = page.begin(); page_iter != page.end(); ++page_iter) {             
     if (std::next(page_iter) != page.end() &&
       is_preciding_num_in_subpage(rules, Page(std::next(page_iter), page.end()), *page_iter)) {
-        std::cout << "Found a number that has to be before " << *page_iter << '\n';
       return false;
     }
   }
@@ -110,13 +109,61 @@ auto get_sum_of_nums_in_the_middle_of_valid_pages(const std::vector<Page> &pages
   return sum;
 }
 
+auto get_number_violating_rules_iter(const Page &page, const Rules &rules, const Page::const_iterator &part_iter) {
+  const auto numbers_preciding_number = get_numbers_preciding_number(rules, *part_iter);
+  for (const auto &number : numbers_preciding_number) {
+    const auto num_violating_rules_iter = std::find(std::next(part_iter), page.end(), number);
+    if (num_violating_rules_iter != page.end()) {
+      return num_violating_rules_iter;
+    }
+  }
+  throw std::runtime_error("No number violating rules found");
+}
+
+void fix_page_one_part_in_page(Page &page, const Rules &rules) {
+  for (auto page_iter = page.begin(); page_iter != page.end(); ++page_iter) {
+    if (std::next(page_iter) != page.end() &&
+      is_preciding_num_in_subpage(rules, Page(std::next(page_iter), page.end()), *page_iter)) {
+        auto num_violating_rules_iter = get_number_violating_rules_iter(page, rules, page_iter);
+      const auto num_violating_rules = *num_violating_rules_iter;
+      page.erase(num_violating_rules_iter);
+      page.insert(page_iter, num_violating_rules);
+    }
+  }
+}
+
+void fix_page(Page &page, const Rules &rules) {
+  while(!is_page_in_correct_order(page, rules)) {
+    fix_page_one_part_in_page(page, rules);
+  }
+}
+
+auto fix_pages(const std::vector<Page> &pages, const Rules &rules) {
+  std::vector<Page> fixed_pages;
+  for (const auto &page : pages) {
+    if (!is_page_in_correct_order(page, rules)) {
+      auto page_to_fix = page;
+      fix_page(page_to_fix, rules);
+      fixed_pages.push_back(page_to_fix);
+    }
+  }
+  return fixed_pages;
+}
+
 int main() {
   auto file = open_file(filename);
   const auto file_as_str = file_to_string(file);
   const auto rules = get_rules(file_as_str);
   const auto pages = get_pages(file_as_str, rules.size() + 1); // There is empty line in file
+
+  // Part 1
   const auto sum = get_sum_of_nums_in_the_middle_of_valid_pages(pages, rules);
   std::cout << "Sum: " << sum << std::endl;
+
+  // Part 2
+  const auto fixed_pages = fix_pages(pages, rules);
+  const auto sum_fixed = get_sum_of_nums_in_the_middle_of_valid_pages(fixed_pages, rules);
+  std::cout << "Sum fixed: " << sum_fixed << std::endl;
 
   return 0;
 }
