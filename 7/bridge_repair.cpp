@@ -50,15 +50,6 @@ auto parse_equations(const std::vector<std::string> &equations_str) {
     return equations;
 }
 
-void print_permutations(const std::vector<std::vector<std::string>> &permutations) {
-  for (const auto &permutation : permutations) {
-    for (const auto &num : permutation) {
-      std::cout << num << ' ';
-    }
-    std::cout << '\n';
-  }
-}
-
 DataType combine(const DataType &lhs, const DataType &rhs) {
   return std::stoull(std::to_string(lhs) + std::to_string(rhs));
 }
@@ -74,48 +65,31 @@ auto get_permutations(const Permutation initial_composition, const std::vector<s
 }
 
 auto get_all_operators_permutations(const size_t num_of_operations, const std::vector<std::string> &operators) -> std::vector<Permutation> {
-  using Permutation = std::vector<std::string>;
-  std::vector<Permutation> all_permutations;
+  std::vector<Permutation> all_combinations;
+  const size_t total_combinations = std::pow(operators.size(), num_of_operations);
 
-  for (size_t op_id = 0; op_id < operators.size(); ++op_id) {
-    Permutation initial_permutation(num_of_operations, operators[op_id]);
-    const auto next_operator_id = (op_id + 1) % operators.size();
-    for (size_t i = 0; i < num_of_operations; ++i) {
-      initial_permutation[i] = operators[next_operator_id];
-      const auto permutations = get_permutations(initial_permutation, operators);
-      all_permutations.insert(all_permutations.end(), permutations.begin(), permutations.end());
+  for (size_t i = 0; i < total_combinations; ++i) {
+    Permutation current_combination;
+    size_t index = i;
+    for (size_t j = 0; j < num_of_operations; ++j) {
+        current_combination.push_back(operators[index % operators.size()]);
+        index /= operators.size();
     }
+    all_combinations.push_back(current_combination);
   }
-  return all_permutations;
-}
-
-void print_equation(const std::vector<DataType> &equation_constants, const std::vector<std::string> &operators, DataType result) {
-  for (size_t i = 0; i < equation_constants.size(); ++i) {
-      std::cout << equation_constants[i];
-      if (i < equation_constants.size() - 1) {
-          std::cout << operators[i];
-      }
-  }
-  std::cout << " = " << result << '\n';
+  return all_combinations;
 }
 
 auto get_result(const std::vector<DataType> &equation_constants, const std::vector<std::string> &operators) {
-  DataType result;
-  if (operators.front() == "+") {
-    result = equation_constants[0] + equation_constants[1];
-  } else if (operators.front() == "*") {
-    result = equation_constants[0] * equation_constants[1];
-  } else if (operators.front() == "||") {
-    result = combine(equation_constants[0], equation_constants[1]);
-  }
+  DataType result = equation_constants[0];
 
-  for (size_t i = 2; i < equation_constants.size(); ++i) {
-    if (operators[i - 1] == "+") {
-      result += equation_constants[i];
-    } else if (operators[i - 1] == "*") {
-      result *= equation_constants[i];
-    } else if (operators[i - 1] == "||") {
-      result = combine(result, equation_constants[i]);
+  for (size_t i = 0; i < operators.size(); ++i) {
+    if (operators[i] == "+") {
+      result += equation_constants[i+1];
+    } else if (operators[i] == "*") {
+      result *= equation_constants[i+1];
+    } else if (operators[i] == "||") {
+      result = combine(result, equation_constants[i+1]);
     } else {
       throw std::runtime_error("Invalid operator");
     }
@@ -131,7 +105,6 @@ auto get_total_calibration_result(const std::vector<DataType> &equation_constant
   const auto operator_combinations = get_all_operators_permutations(num_of_operations, operators);
   for (const auto &operators : operator_combinations) {
     if (get_result(equation_constants, operators) == correct_result) {
-      print_equation(equation_constants, operators, correct_result);
       return correct_result;
     }
   }
@@ -150,19 +123,20 @@ auto split_equations(const std::vector<std::vector<DataType>> &equations_with_re
   return std::make_pair(results, constants);
 }
 
-auto count_correct_results_for_all_equations(const std::vector<std::vector<DataType>> &equations_with_results, const std::vector<std::string> &operators) {
+auto get_combined_calibration_result(const std::vector<std::vector<DataType>> &equations_with_results, const std::vector<std::string> &operators) {
   const auto [correct_results, constants] = split_equations(equations_with_results);
-  DataType num_of_correct_results = 0;
+  DataType combined_calibration_result = 0;
   for (const auto &[equation, correct_result] : std::ranges::views::zip(constants, correct_results)) {
-    num_of_correct_results += get_total_calibration_result(equation, correct_result, operators);    
+    combined_calibration_result += get_total_calibration_result(equation, correct_result, operators);    
   }
-  return num_of_correct_results;
+  return combined_calibration_result;
 }
 
 int main() {
   auto file = open_file(filename);
   auto lab_map = file_to_string(file);
   const auto parsed_equations = parse_equations(lab_map);
-  std::cout << count_correct_results_for_all_equations(parsed_equations, {"+", "*"}) << '\n';
+  std::cout << "Part 1: " << get_combined_calibration_result(parsed_equations, {"+", "*"}) << '\n';
+  std::cout << "Part 2: " << get_combined_calibration_result(parsed_equations, {"+", "*", "||"}) << '\n';
   return 0;
 }
