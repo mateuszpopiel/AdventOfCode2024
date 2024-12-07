@@ -57,10 +57,10 @@ auto is_guard_facing_obstacle(const LabMap &map, const Position &guards_position
   const auto [i, j] = guards_position;
   switch (map[i][j])
   {
-    case '^': return map[i - 1][j] == '#';
-    case 'v': return map[i + 1][j] == '#';
-    case '<': return map[i][j - 1] == '#';
-    case '>': return map[i][j + 1] == '#';
+    case '^': return map[i - 1][j] == '#' || map[i - 1][j] == 'O';
+    case 'v': return map[i + 1][j] == '#' || map[i + 1][j] == 'O';
+    case '<': return map[i][j - 1] == '#' || map[i][j - 1] == 'O';
+    case '>': return map[i][j + 1] == '#' || map[i][j + 1] == 'O';
     default: std::unreachable();
   }
 }
@@ -94,7 +94,63 @@ void print_map(const LabMap &map) {
   }
 }
 
-void simulate_guards_movement(LabMap &map) {
+auto get_obstacle_position(const Position &pos, const char orientation) {
+  switch (orientation)
+  {
+    case '^': return std::make_pair(pos.first - 1, pos.second);
+    case 'v': return std::make_pair(pos.first + 1, pos.second);
+    case '<': return std::make_pair(pos.first, pos.second - 1);
+    case '>': return std::make_pair(pos.first, pos.second + 1);
+    default: std::unreachable();
+  }
+}
+
+bool is_loop_detected(const std::vector<std::pair<Position, char>>& path) {
+  // Smallest path is 4 steps, smallest loop would be 8, detected on 9th step
+  if (path.size() < 10) return false;
+
+  auto current_state = path.back();
+  auto first_visit_it = std::find(path.begin(), path.end() - 1, current_state);
+  if (first_visit_it == path.end() - 1) {
+    return false;
+  }
+  const auto loop_length = path.end() - first_visit_it;
+  for (int i = 0; i < loop_length; ++i) {
+    if (path[first_visit_it - path.begin() + i] != path[path.size() - loop_length + i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+auto could_add_obstacle(const Position &guard_pos, const LabMap &map) {
+  auto pos = guard_pos;
+  auto map_copy = map;
+  const auto [new_obst_i, new_obst_y] = get_obstacle_position(pos, map_copy[pos.first][pos.second]);
+  std::vector<std::pair<Position, char>> path;
+  map_copy[new_obst_i][new_obst_y] = 'O';
+  for (auto position = find_guards_position(map_copy);
+       !is_leaving_map(map_copy, position);
+       position = find_guards_position(map_copy)) {
+    const auto [i, j] = position;
+    path.push_back({position, map_copy[i][j]});
+    if (is_guard_facing_obstacle(map_copy, position)) {
+      map_copy[i][j] = turn_right(map_copy[i][j]);
+      continue;
+    }
+    const auto next_pos = move_forward(position, map_copy[i][j]);
+    map_copy[next_pos.first][next_pos.second] = map_copy[i][j];
+    map_copy[i][j] = '+';
+    if (is_loop_detected(path)) {
+      // print_map(map_copy);
+      return true;
+    }
+  }
+  return false;
+}
+
+auto simulate_guards_movement(LabMap &map) {
+  auto num_of_obstacles_to_add = 0;
   for (auto position = find_guards_position(map);
        !is_leaving_map(map, position);
        position = find_guards_position(map)) {
@@ -103,10 +159,14 @@ void simulate_guards_movement(LabMap &map) {
       map[i][j] = turn_right(map[i][j]);
       continue;
     }
+    if (could_add_obstacle(position, map)) {
+      ++num_of_obstacles_to_add;
+    }
     const auto [next_i, next_j] = move_forward(position, map[i][j]);
     map[next_i][next_j] = map[i][j];
     map[i][j] = 'X';
   }
+  return num_of_obstacles_to_add;
 }
 
 auto get_distinct_positions_number(const LabMap &filled_map) {
@@ -120,7 +180,8 @@ auto get_distinct_positions_number(const LabMap &filled_map) {
 int main() {
   auto file = open_file(filename);
   auto lab_map = file_to_string(file);
-  simulate_guards_movement(lab_map);
+  const auto num_of_obstacles_to_add = simulate_guards_movement(lab_map);
   std::cout << get_distinct_positions_number(lab_map) << '\n';
+  std::cout << num_of_obstacles_to_add << '\n';
   return 0;
 }
