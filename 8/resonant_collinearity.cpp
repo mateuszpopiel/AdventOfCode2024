@@ -58,35 +58,48 @@ auto compute_vector(const Coordinates &a, const Coordinates &b) {
   return std::make_pair(b.first - a.first, b.second - a.second);
 }
 
-auto get_antinodes_for_two_antennas(
-  const Coordinates &antenna1, const Coordinates &antenna2, const Map &city_map) {
+auto is_antinode_valid(const Coordinates &antinode, const Map &city_map) {
+  return antinode.first >= 0 && static_cast<size_t>(antinode.first) < city_map.size() &&
+         antinode.second >= 0 && static_cast<size_t>(antinode.second) < city_map[0].size();
+}
 
-  std::vector<Coordinates> antinodes;
-  const auto frequency = city_map[antenna1.first][antenna1.second];
-  const auto vector_coordinates = compute_vector(antenna2, antenna1);
-  const auto potential_antinode1 =
-    std::make_pair(antenna1.first + vector_coordinates.first, antenna1.second + vector_coordinates.second);
-  const auto potential_antinode2 =
-    std::make_pair(antenna2.first - vector_coordinates.first, antenna2.second - vector_coordinates.second);
-  if (potential_antinode1.first >= 0 && static_cast<size_t>(potential_antinode1.first) < city_map.size() &&
-      potential_antinode1.second >= 0 && static_cast<size_t>(potential_antinode1.second) < city_map[0].size() &&
-      (city_map[potential_antinode1.first][potential_antinode1.second] != frequency)) {
-    antinodes.push_back(potential_antinode1);
-  }
-  if (potential_antinode2.first >= 0 && static_cast<size_t>(potential_antinode2.first) < city_map.size() &&
-      potential_antinode2.second >= 0 && static_cast<size_t>(potential_antinode2.second) < city_map[0].size() &&
-      (city_map[potential_antinode2.first][potential_antinode2.second] != frequency)) {
-    antinodes.push_back(potential_antinode2);
+auto get_antinodes_for_single_antenna_p1(const Coordinates &antenna, const Coordinates &harmonic_vector, const Map &city_map) {
+  std::vector<Coordinates> antinodes {};
+  const auto frequency = city_map[antenna.first][antenna.second];
+  const auto potential_antinode = std::make_pair(antenna.first + harmonic_vector.first, antenna.second + harmonic_vector.second);
+  if (is_antinode_valid(potential_antinode, city_map) &&
+      city_map[potential_antinode.first][potential_antinode.second] != frequency) {
+    antinodes.push_back(potential_antinode);
   }
   return antinodes;
 }
 
-auto get_antinodes_for_frequency(const Map &city_map, const char frequency) {
+auto get_antinodes_for_single_antenna_p2(const Coordinates &antenna, const Coordinates &harmonic_vector, const Map &city_map) {
+  return get_antinodes_for_single_antenna_p1(antenna, harmonic_vector, city_map);
+}
+
+auto get_antinodes_for_two_antennas(
+  const Coordinates &antenna1, const Coordinates &antenna2, const Map &city_map, const bool is_part_2) {
+  std::vector<Coordinates> antinodes;
+  const auto positive_vector_coordinates = compute_vector(antenna1, antenna2);
+  const auto negative_vector_coordinates = compute_vector(antenna2, antenna1);
+  const auto positive_antinodes = is_part_2
+    ? get_antinodes_for_single_antenna_p2(antenna2, positive_vector_coordinates, city_map)
+    : get_antinodes_for_single_antenna_p1(antenna2, positive_vector_coordinates, city_map);
+  const auto negative_antinodes = is_part_2
+    ? get_antinodes_for_single_antenna_p2(antenna1, negative_vector_coordinates, city_map)
+    : get_antinodes_for_single_antenna_p1(antenna1, negative_vector_coordinates, city_map);
+  antinodes.insert(antinodes.end(), positive_antinodes.begin(), positive_antinodes.end());
+  antinodes.insert(antinodes.end(), negative_antinodes.begin(), negative_antinodes.end());
+  return antinodes;
+}
+
+auto get_antinodes_for_frequency(const Map &city_map, const char frequency, const bool is_part_2) {
   const auto antennas = get_same_frequency_antennas_coordinates(city_map, frequency);
   std::vector<Coordinates> antinodes;
   for (auto antenna1_iter = antennas.begin(); antenna1_iter != std::prev(antennas.end()); ++antenna1_iter) {
     for (auto antenna2_iter = std::next(antenna1_iter); antenna2_iter != antennas.end(); ++antenna2_iter) {
-      const auto new_antinodes = get_antinodes_for_two_antennas(*antenna1_iter, *antenna2_iter, city_map);
+      const auto new_antinodes = get_antinodes_for_two_antennas(*antenna1_iter, *antenna2_iter, city_map, is_part_2);
       for (const auto &antinode : new_antinodes) {
         antinodes.push_back(antinode);
       }
@@ -100,26 +113,21 @@ void remove_duplicates(std::vector<Coordinates> &vec) {
   vec.erase(std::unique(vec.begin(), vec.end()), vec.end());
 }
 
-auto count_antinodes(const Map &city_map) {
+auto count_antinodes(const Map &city_map, const bool is_part_2) {
   const auto frequencies = get_frequencies(city_map);
   std::vector<Coordinates> antinodes {};
   for (const auto &frequency : frequencies) {
-    const auto new_antinodes = get_antinodes_for_frequency(city_map, frequency);
+    const auto new_antinodes = get_antinodes_for_frequency(city_map, frequency, is_part_2);
     antinodes.insert(antinodes.end(), new_antinodes.begin(), new_antinodes.end());
   }
   remove_duplicates(antinodes);
   return antinodes.size();
 }
 
-void print_map(const std::vector<std::string> &vec) {
-  for (const auto &row : vec) {
-    std::cout << row << '\n';
-  }
-}
-
 int main() {
   auto file = open_file(filename);
-  auto city_map = file_to_string(file);
-  std::cout << "Antinodes num: " << count_antinodes(city_map) << '\n';  
+  const auto city_map = file_to_string(file);
+  const auto part_2 = true;
+  std::cout << "Antinodes num: " << count_antinodes(city_map, part_2) << '\n';  
   return 0;
 }
