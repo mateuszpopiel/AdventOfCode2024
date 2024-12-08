@@ -9,7 +9,6 @@
 #include <algorithm>
 #include <numeric>
 #include <ranges>
-#include <bitset>
 #include <cmath>
 
 static constexpr std::string_view filename {"data.txt"};
@@ -52,16 +51,6 @@ auto parse_equations(const std::vector<std::string> &equations_str) {
 
 DataType combine(const DataType &lhs, const DataType &rhs) {
   return std::stoull(std::to_string(lhs) + std::to_string(rhs));
-}
-
-auto get_permutations(const Permutation initial_composition, const std::vector<std::string> &operators) {
-  std::vector<Permutation> permutations;
-  Permutation permutation = initial_composition;
-  std::sort(permutation.begin(), permutation.end());
-  do {
-    permutations.push_back(permutation);
-  } while (std::next_permutation(permutation.begin(), permutation.end()));
-  return permutations;
 }
 
 auto get_all_operators_permutations(const size_t num_of_operations, const std::vector<std::string> &operators) -> std::vector<Permutation> {
