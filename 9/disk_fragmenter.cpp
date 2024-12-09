@@ -25,13 +25,6 @@ auto file_to_string(std::ifstream &file) {
   return lines;
 }
 
-void print_vector(const std::vector<int> &vec) {
-  for (const auto &v : vec) {
-    std::cout << v;
-  }
-  std::cout << '\n';
-}
-
 auto string_to_int_vector(const std::string &str) {
   std::vector<int> numbers;
   numbers.reserve(str.length());
@@ -99,6 +92,8 @@ std::vector<int> rearrange_disk_p2(std::vector<int> &disk_map) {
         rearranged_disk.insert(rearranged_disk.end(), moved_files[in_disk_map_id], 0);
       } else {
         rearranged_disk.insert(rearranged_disk.end(), disk_map[in_disk_map_id], in_disk_map_id / 2);
+        // mark file as used (assign 0)
+        disk_map[in_disk_map_id] = 0;
       }
       continue;
     }
@@ -109,12 +104,6 @@ std::vector<int> rearrange_disk_p2(std::vector<int> &disk_map) {
       rearranged_disk.insert(rearranged_disk.end(), disk_map[in_disk_map_id], 0);
       continue;
     }
-    /*
-    if (fitting_file_id < in_disk_map_id) {
-      // File already added
-      break;
-    }
-    */
     rearranged_disk.insert(rearranged_disk.end(), disk_map[fitting_file_id], fitting_file_id / 2);
     disk_map[in_disk_map_id] -= disk_map[fitting_file_id];
 
@@ -135,7 +124,7 @@ int main() {
   auto file = open_file(filename);
   auto disk_map = string_to_int_vector(file_to_string(file).front());
   const auto rearranged_disk = rearrange_disk_p2(disk_map);
-  // print_vector(rearranged_disk);
+  // 6289564433984
   std::cout << compute_checksum(rearranged_disk) << '\n';
   return 0;
 }
