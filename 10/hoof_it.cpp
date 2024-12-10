@@ -108,13 +108,13 @@ void remove_repeated_peaks(std::vector<Coordinates> &peaks) {
   peaks.erase(std::unique(peaks.begin(), peaks.end()), peaks.end());
 }
 
-auto get_sum_of_the_scores_of_all_trailheads(const Map &map) {
+auto get_sum_of_the_scores_of_all_trailheads(const Map &map, const bool part_2 = false) {
   size_t sum = 0;
   const auto trailheads = get_all_trailheads(map);
   for (const auto &trailhead : trailheads) {
     std::vector<Coordinates> reachable_peaks {};
     get_reachable_peaks(map, trailhead, reachable_peaks);
-    remove_repeated_peaks(reachable_peaks);
+    if (!part_2) remove_repeated_peaks(reachable_peaks);
     sum += reachable_peaks.size();
   }
   return sum;
@@ -124,8 +124,7 @@ int main() {
   auto file = open_file(filename);
   const auto file_as_string = file_to_string(file);
   const auto topographic_map = file_as_string_to_map(file_as_string);
-  // print_map(topographic_map);
-  const auto sum = get_sum_of_the_scores_of_all_trailheads(topographic_map);
-  std::cout << "Part 1: " << sum << '\n';
+  std::cout << get_sum_of_the_scores_of_all_trailheads(topographic_map) << '\n'; // 709
+  std::cout << get_sum_of_the_scores_of_all_trailheads(topographic_map, true) << '\n'; // 1326
   return 0;
 }
