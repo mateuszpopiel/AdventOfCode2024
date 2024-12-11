@@ -20,7 +20,7 @@ auto open_file(const std::string_view filename) {
   return file;
 }
 
-auto file_to_line(std::ifstream &file) -> std::unordered_map<uint64_t, uint64_t> {
+auto parse_file_line(std::ifstream &file) -> std::unordered_map<uint64_t, uint64_t> {
   std::string line_as_string;
   std::unordered_map<uint64_t, uint64_t> line_as_map;
   std::getline(file, line_as_string);
@@ -33,18 +33,14 @@ auto file_to_line(std::ifstream &file) -> std::unordered_map<uint64_t, uint64_t>
 }
 
 constexpr auto get_num_of_digits(uint64_t number) -> uint64_t {
-  uint64_t digits = 0;
-  while (number > 0) {
-    number /= 10;
-    ++digits;
-  }
-  return digits;
+  return number > 0 ? static_cast<uint64_t>(std::log10(number)) + 1 : 1;
 }
 
 constexpr auto split_number_digits(const uint64_t number) -> std::array<uint64_t, 2> {
   const uint64_t number_of_digits = get_num_of_digits(number);
-  const uint64_t first_number = number / std::pow(10, number_of_digits / 2);
-  const uint64_t second_number = number % static_cast<uint64_t>(std::pow(10, number_of_digits / 2));
+  const uint64_t divisor = std::pow(10, number_of_digits / 2);
+  const uint64_t first_number = number / divisor;
+  const uint64_t second_number = number % divisor;
   return {first_number, second_number};
 }
 
@@ -72,16 +68,19 @@ auto blink_n_times(const std::unordered_map<uint64_t, uint64_t> &line, const uin
     new_line = blink(new_line);
   }
 
-  return std::accumulate(new_line.begin(), new_line.end(), 0, [](const uint64_t sum, const auto &pair) {
-    return sum + pair.second;
-  });
+  uint64_t sum = 0;
+  for (const auto &[_, count] : new_line) {
+    sum += count;
+  }
+  return sum;
 }
 
 int main() {
   auto file = open_file(filename);
-  auto line_of_stones = file_to_line(file);
+  auto line_of_stones = parse_file_line(file);
 
   std::cout << blink_n_times(line_of_stones, 25) << '\n'; // 199753
   std::cout << blink_n_times(line_of_stones, 75) << '\n'; // 239413123020116
+
   return 0;
 }
