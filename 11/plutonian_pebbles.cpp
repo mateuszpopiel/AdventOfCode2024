@@ -4,12 +4,13 @@
 #include <string>
 #include <string_view>
 #include <sstream>
-#include <numeric>
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <chrono>
 
 static constexpr std::string_view filename = "data.txt";
+static constexpr size_t max_vector_size = 1'000'000;
 
 auto open_file(const std::string_view filename) {
   std::ifstream file(filename.data());
@@ -44,7 +45,7 @@ constexpr auto get_num_of_digits(size_t number) -> size_t {
     number /= 10;
     ++digits;
   }
-  return digits;  
+  return digits;
 }
 
 constexpr auto has_even_num_of_digits(const size_t number) -> bool {
@@ -71,6 +72,7 @@ constexpr auto rule_3(const size_t stone_number) {
 
 auto blink(const std::vector<size_t> &line) {
   std::vector<size_t> new_line {};
+  new_line.reserve(max_vector_size);
   for (const auto number : line) {
     if (number == 0) {
       new_line.push_back(rule_1(number));
@@ -88,6 +90,7 @@ auto blink(const std::vector<size_t> &line) {
 
 auto split_vector_into_chunks(const std::vector<size_t> &line, const size_t chunk_size) {
   std::vector<std::vector<size_t>> chunks;
+  chunks.reserve(max_vector_size);
   for (size_t i = 0; i < line.size(); i += chunk_size) {
     const auto begin = line.begin() + i;
     const auto potential_end_of_chunk_index = line.begin() + i + chunk_size;
@@ -112,7 +115,6 @@ auto solve_in_chunks(const std::vector<size_t> &line, const size_t chunk_size, c
 }
 
 auto blink_n_times(const std::vector<size_t> &line, const size_t n) -> size_t {
-  static constexpr size_t max_vector_size = 1'000'000;
   std::vector<size_t> new_line = line;
   for (size_t i = 0; i < n; ++i) {
     new_line = blink(new_line);
@@ -126,7 +128,11 @@ auto blink_n_times(const std::vector<size_t> &line, const size_t n) -> size_t {
 int main() {
   auto file = open_file(filename);
   const auto line_of_stones = file_to_line(file);
+  const auto before = std::chrono::high_resolution_clock::now();
   std::cout << blink_n_times(line_of_stones, 25) << '\n'; // 199753
+  const auto after = std::chrono::high_resolution_clock::now();
+  std::cout << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(after - before).count() << "ms\n";
   std::cout << blink_n_times(line_of_stones, 75) << '\n';
+  std::cout << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - after).count() << "ms\n";
   return 0;
 }
