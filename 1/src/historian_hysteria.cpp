@@ -1,9 +1,5 @@
 #include "file_helpers.hpp"
-#include <iostream>
-#include <fstream>
-#include <vector>
 #include <algorithm>
-#include <string_view> 
 
 using LocationId = unsigned int;
 
@@ -20,7 +16,7 @@ unsigned int get_total_distance(const std::pair<std::vector<LocationId>, std::ve
 
     unsigned int distance = 0;
     for (size_t i = 0; i < left_list.size(); ++i) {
-        distance += std::abs(static_cast<int>(left_list[i]) - static_cast<int>(right_list[i]));
+        distance += static_cast<unsigned int>(std::abs(static_cast<int>(left_list[i]) - static_cast<int>(right_list[i])));
     }
     return distance;
 }
