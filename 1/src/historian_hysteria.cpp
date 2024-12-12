@@ -1,8 +1,9 @@
+#include "file_helpers.hpp"
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <algorithm>
-#include <stdexcept>
+#include <string_view> 
 
 using LocationId = unsigned int;
 
@@ -24,12 +25,8 @@ unsigned int get_total_distance(const std::pair<std::vector<LocationId>, std::ve
     return distance;
 }
 
-int main() {
-    std::ifstream file("data.txt");
-    if (!file.is_open()) {
-        std::cerr << "Error: Could not open file." << std::endl;
-        return 1;
-    }
+unsigned int solve() {
+    auto file = open_file();
 
     std::vector<LocationId> left_list;
     std::vector<LocationId> right_list;
@@ -40,11 +37,5 @@ int main() {
         right_list.push_back(right);
     }
 
-    try {
-        std::cout << get_total_distance(std::make_pair(left_list, right_list)) << std::endl;
-    } catch (const std::exception &e) {
-        std::cerr << "Error: " << e.what() << std::endl;
-    }
-
-    return 0;
+    return get_total_distance(std::make_pair(left_list, right_list));
 }

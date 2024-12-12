@@ -11,70 +11,17 @@
       "displayName": "Solution for a day 1",
       "description": "Provided solution for a day 1",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build"
+      "binaryDir": "${sourceDir}/build/day_1"
     },
     {
-      "name": "Day 2",
-      "displayName": "Solution for a day 2",
-      "description": "Provided solution for a day 2",
+      "name": "Tests",
+      "displayName": "Tests",
+      "description": "Run tests",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build"
-    },
-    {
-      "name": "Day 3",
-      "displayName": "Solution for a day 3",
-      "description": "Provided solution for a day 3",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build"
-    },
-    {
-      "name": "Day 4",
-      "displayName": "Solution for a day 4",
-      "description": "Provided solution for a day 4",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build"
-    },
-    {
-      "name": "Day 5",
-      "displayName": "Solution for a day 5",
-      "description": "Provided solution for a day 5",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build"
-    },
-    {
-      "name": "Day 6",
-      "displayName": "Solution for a day 6",
-      "description": "Provided solution for a day 6",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build"
-    },
-    {
-      "name": "Day 7",
-      "displayName": "Solution for a day 7",
-      "description": "Provided solution for a day 7",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build"
-    },
-    {
-      "name": "Day 8",
-      "displayName": "Solution for a day 8",
-      "description": "Provided solution for a day 8",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build"
-    },
-    {
-      "name": "Day 9",
-      "displayName": "Solution for a day 9",
-      "description": "Provided solution for a day 9",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build"
-    },
-    {
-      "name": "Day 10",
-      "displayName": "Solution for a day 10",
-      "description": "Provided solution for a day 10",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build"
+      "binaryDir": "${sourceDir}/build/tests",
+      "cacheVariables": {
+        "ENABLE_TESTS": "ON"
+      }
     }
   ],
   "buildPresets": [
@@ -84,49 +31,19 @@
       "description": "Build solution for a day 1"
     },
     {
-      "name": "Day 2",
-      "configurePreset": "Day 2",
-      "description": "Build solution for a day 2"
-    },
+      "name": "Tests",
+      "configurePreset": "Tests",
+      "description": "Build tests"
+    }
+  ],
+  "testPresets": [
     {
-      "name": "Day 3",
-      "configurePreset": "Day 3",
-      "description": "Build solution for a day 3"
-    },
-    {
-      "name": "Day 4",
-      "configurePreset": "Day 4",
-      "description": "Build solution for a day 4"
-    },
-    {
-      "name": "Day 5",
-      "configurePreset": "Day 5",
-      "description": "Build solution for a day 5"
-    },
-    {
-      "name": "Day 6",
-      "configurePreset": "Day 6",
-      "description": "Build solution for a day 6"
-    },
-    {
-      "name": "Day 7",
-      "configurePreset": "Day 7",
-      "description": "Build solution for a day 7"
-    },
-    {
-      "name": "Day 8",
-      "configurePreset": "Day 8",
-      "description": "Build solution for a day 8"
-    },
-    {
-      "name": "Day 9",
-      "configurePreset": "Day 9",
-      "description": "Build solution for a day 9"
-    },
-    {
-      "name": "Day 10",
-      "configurePreset": "Day 10",
-      "description": "Build solution for a day 10"
+      "name": "Tests",
+      "configurePreset": "Tests",
+      "description": "Run tests",
+      "output": {
+        "outputOnFailure": true
+      }
     }
   ]
 }
