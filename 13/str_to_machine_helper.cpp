@@ -1,5 +1,7 @@
 #include "str_to_machine_helper.hpp"
 
+inline constexpr long long unit_conversion_shift = 10'000'000'000'000;
+
 auto get_button(std::istringstream &iss) -> std::optional<Coordinates> {
   std::string temp, x, y;
   Coordinates button;
@@ -35,7 +37,7 @@ auto get_prize(std::istringstream &iss) -> std::optional<Coordinates> {
   return prize;
 }
 
-auto get_machines(const std::vector<std::string> &input) -> std::vector<Machine> {
+auto get_machines(const std::vector<std::string> &input, const bool part_2) -> std::vector<Machine> {
   std::vector<Machine> machines;
   std::istringstream iss { multiline_string_to_single_line(input) };
   while (iss) {
@@ -58,6 +60,10 @@ auto get_machines(const std::vector<std::string> &input) -> std::vector<Machine>
       break;
     }
     machine.prize = maybe_prize.value();
+    if (part_2) {
+      machine.prize.x += unit_conversion_shift;
+      machine.prize.y += unit_conversion_shift;
+    }
 
     machines.push_back(machine);
   }
