@@ -1,5 +1,8 @@
 #include "file_helpers.hpp"
 #include <algorithm>
+#include <stdexcept>
+#include <utility>
+#include <vector>
 
 using LocationId = unsigned int;
 
@@ -27,7 +30,8 @@ unsigned int solve() {
     std::vector<LocationId> left_list;
     std::vector<LocationId> right_list;
 
-    LocationId left, right;
+    LocationId left = 0;
+    LocationId right = 0;
     while (file >> left >> right) {
         left_list.push_back(left);
         right_list.push_back(right);

@@ -1,5 +1,10 @@
 #include "../inc/file_helpers.hpp"
+#include <fstream>
 #include <iostream>
+#include <stdexcept>
+#include <string>
+#include <string_view>
+#include <vector>
 
 auto open_file(const std::string_view &filename) -> std::ifstream {
   std::ifstream file(filename.data());

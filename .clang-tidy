@@ -1,0 +1,19 @@
+Checks: >
+  clang-diagnostic-*,
+  clang-analyzer-*,
+  bugprone-*,
+  performance-*,
+  portability-*,
+  readability-*,
+  modernize-*,
+  cppcoreguidelines-*,
+  misc-*,
+  -misc-include-cleaner,
+  -modernize-use-trailing-return-type,
+  -cppcoreguidelines-pro-type-reinterpret-cast,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+
+WarningsAsErrors: '*'
+
+HeaderFilterRegex: '.*'
+FormatStyle: file

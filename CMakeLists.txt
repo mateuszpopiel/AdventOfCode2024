@@ -16,6 +16,12 @@ add_compile_options(
   -fstack-usage
 )
 
+# Set the path to your .clang-tidy file
+set(CLANG_TIDY_FILE ${CMAKE_SOURCE_DIR}/.clang-tidy)
+
+# Configure CMake to use clang-tidy
+set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-config-file=${CLANG_TIDY_FILE}")
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(copy_data_file)
 include(day_setup)
