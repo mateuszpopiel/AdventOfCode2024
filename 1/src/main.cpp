@@ -2,6 +2,6 @@
 #include <iostream>
 
 int main() {
-  std::cout << solve() << std::endl;
+  std::cout << solve() << '\n';
   return 0;
 }
