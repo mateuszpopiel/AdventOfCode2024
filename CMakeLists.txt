@@ -18,6 +18,7 @@ add_compile_options(
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(copy_data_file)
+include(day_setup)
 
 if (ENABLE_TESTS)
   enable_testing()
