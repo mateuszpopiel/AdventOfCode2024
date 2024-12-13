@@ -1,29 +1,23 @@
 #include "../lib/inc/file_helpers.hpp"
 #include <iostream>
-#include <sstream>
 #include <optional>
+#include <sstream>
 
 struct Coordinates {
   long long x;
   long long y;
 
-  constexpr Coordinates operator+(const Coordinates &other) const {
-    return {x + other.x, y + other.y};
-  }
+  constexpr Coordinates operator+(const Coordinates &other) const { return {x + other.x, y + other.y}; }
 
-  Coordinates& operator+=(const long long shift) {
+  Coordinates &operator+=(const long long shift) {
     this->x += shift;
     this->y += shift;
     return *this;
   }
 
-  constexpr Coordinates operator*(const long long scalar) const {
-    return {x * scalar, y * scalar};
-  }
+  constexpr Coordinates operator*(const long long scalar) const { return {x * scalar, y * scalar}; }
 
-  constexpr bool operator==(const Coordinates &other) const {
-    return x == other.x && y == other.y;
-  }
+  constexpr bool operator==(const Coordinates &other) const { return x == other.x && y == other.y; }
 };
 
 struct Machine {

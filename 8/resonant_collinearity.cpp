@@ -1,17 +1,17 @@
-#include <iostream>
-#include <fstream>
-#include <string_view>
-#include <vector>
-#include <sstream>
-#include <array>
-#include <string>
-#include <utility>
 #include <algorithm>
+#include <array>
+#include <cmath>
+#include <fstream>
+#include <iostream>
 #include <numeric>
 #include <ranges>
-#include <cmath>
+#include <sstream>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
 
-static constexpr std::string_view filename {"data.txt"};
+static constexpr std::string_view filename{"data.txt"};
 
 using Map = std::vector<std::string>;
 using Coordinates = std::pair<long long, long long>;
@@ -36,7 +36,8 @@ auto get_frequencies(const Map &city_map) {
   std::string frequencies;
   for (const auto &line : city_map) {
     for (const auto &c : line) {
-      if ((std::isdigit(c) || std::isalpha(c)) && (frequencies.find(c) == frequencies.npos)) frequencies.push_back(c);
+      if ((std::isdigit(c) || std::isalpha(c)) && (frequencies.find(c) == frequencies.npos))
+        frequencies.push_back(c);
     }
   }
   return frequencies;
@@ -59,13 +60,14 @@ auto compute_vector(const Coordinates &a, const Coordinates &b) {
 }
 
 auto is_antinode_valid(const Coordinates &antinode, const Map &city_map) {
-  return antinode.first >= 0 && static_cast<size_t>(antinode.first) < city_map.size() &&
-         antinode.second >= 0 && static_cast<size_t>(antinode.second) < city_map[0].size();
+  return antinode.first >= 0 && static_cast<size_t>(antinode.first) < city_map.size() && antinode.second >= 0 &&
+         static_cast<size_t>(antinode.second) < city_map[0].size();
 }
 
-auto get_next_antinode(const Coordinates &antenna, const Coordinates &harmonic_vector, const Map &city_map, const char frequency)
-  -> std::optional<Coordinates> {
-  const auto potential_antinode = std::make_pair(antenna.first + harmonic_vector.first, antenna.second + harmonic_vector.second);
+auto get_next_antinode(const Coordinates &antenna, const Coordinates &harmonic_vector, const Map &city_map,
+                       const char frequency) -> std::optional<Coordinates> {
+  const auto potential_antinode =
+      std::make_pair(antenna.first + harmonic_vector.first, antenna.second + harmonic_vector.second);
   if (is_antinode_valid(potential_antinode, city_map)) {
     return potential_antinode;
   }
@@ -91,8 +93,8 @@ auto get_next_harmonic_antinodes(const Coordinates &antenna, const Coordinates &
   return antinodes;
 }
 
-auto get_antinodes_for_two_antennas(
-  const Coordinates &antenna1, const Coordinates &antenna2, const Map &city_map, const bool is_part_2) {
+auto get_antinodes_for_two_antennas(const Coordinates &antenna1, const Coordinates &antenna2, const Map &city_map,
+                                    const bool is_part_2) {
   std::vector<Coordinates> antinodes;
   const auto positive_vector_coordinates = compute_vector(antenna1, antenna2);
   const auto negative_vector_coordinates = compute_vector(antenna2, antenna1);
@@ -100,8 +102,10 @@ auto get_antinodes_for_two_antennas(
     const auto frequency = city_map[antenna1.first][antenna1.second];
     const auto positive_antinode = get_next_antinode(antenna2, positive_vector_coordinates, city_map, frequency);
     const auto negative_antinode = get_next_antinode(antenna1, negative_vector_coordinates, city_map, frequency);
-    if (positive_antinode.has_value()) antinodes.push_back(positive_antinode.value());
-    if (negative_antinode.has_value()) antinodes.push_back(negative_antinode.value());
+    if (positive_antinode.has_value())
+      antinodes.push_back(positive_antinode.value());
+    if (negative_antinode.has_value())
+      antinodes.push_back(negative_antinode.value());
     return antinodes;
   }
   // Needs to insert antennas as well
@@ -134,7 +138,7 @@ void remove_duplicates(std::vector<Coordinates> &vec) {
 
 auto count_antinodes(const Map &city_map, const bool is_part_2) {
   const auto frequencies = get_frequencies(city_map);
-  std::vector<Coordinates> antinodes {};
+  std::vector<Coordinates> antinodes{};
   for (const auto &frequency : frequencies) {
     const auto new_antinodes = get_antinodes_for_frequency(city_map, frequency, is_part_2);
     antinodes.insert(antinodes.end(), new_antinodes.begin(), new_antinodes.end());
@@ -147,6 +151,6 @@ int main() {
   auto file = open_file(filename);
   const auto city_map = file_to_string(file);
   const auto part_2 = true;
-  std::cout << "Antinodes num: " << count_antinodes(city_map, part_2) << '\n';  
+  std::cout << "Antinodes num: " << count_antinodes(city_map, part_2) << '\n';
   return 0;
 }

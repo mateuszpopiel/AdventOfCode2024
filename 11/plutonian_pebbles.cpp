@@ -1,14 +1,14 @@
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <string_view>
-#include <sstream>
 #include <algorithm>
 #include <array>
-#include <unordered_map>
-#include <numeric>
-#include <cstdint>
 #include <cmath>
+#include <cstdint>
+#include <fstream>
+#include <iostream>
+#include <numeric>
+#include <sstream>
+#include <string>
+#include <string_view>
+#include <unordered_map>
 
 static constexpr std::string_view filename = "data.txt";
 

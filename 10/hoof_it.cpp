@@ -1,10 +1,10 @@
-#include <iostream>
+#include <algorithm>
 #include <fstream>
-#include <vector>
+#include <iostream>
+#include <numeric>
 #include <string>
 #include <string_view>
-#include <numeric>
-#include <algorithm>
+#include <vector>
 
 static constexpr std::string_view filename = "data.txt";
 
@@ -16,19 +16,17 @@ struct Coordinates {
 
   constexpr Coordinates(size_t x, size_t y) : x(x), y(y) {}
 
-  constexpr Coordinates operator+(const Coordinates &other) const {
-    return {x + other.x, y + other.y};
-  }
+  constexpr Coordinates operator+(const Coordinates &other) const { return {x + other.x, y + other.y}; }
 
   constexpr bool operator<(const Coordinates &other) const {
-    if (x < other.x) return true;
-    if (x > other.x) return false;
+    if (x < other.x)
+      return true;
+    if (x > other.x)
+      return false;
     return y < other.y;
   }
 
-  constexpr bool operator==(const Coordinates &other) const {
-    return x == other.x && y == other.y;
-  }
+  constexpr bool operator==(const Coordinates &other) const { return x == other.x && y == other.y; }
 };
 
 auto open_file(const std::string_view filename) {
@@ -86,7 +84,8 @@ auto get_next_steps(const Map &map, const Coordinates &current_position) {
   if (current_position.y > 0 && is_slope_valid(height, map[current_position.x][current_position.y - 1])) {
     steps.push_back({current_position.x, current_position.y - 1});
   }
-  if (current_position.y < map[current_position.x].size() - 1 && is_slope_valid(height, map[current_position.x][current_position.y + 1])) {
+  if (current_position.y < map[current_position.x].size() - 1 &&
+      is_slope_valid(height, map[current_position.x][current_position.y + 1])) {
     steps.push_back({current_position.x, current_position.y + 1});
   }
   return steps;
@@ -112,9 +111,10 @@ auto get_sum_of_the_scores_of_all_trailheads(const Map &map, const bool part_2 =
   size_t sum = 0;
   const auto trailheads = get_all_trailheads(map);
   for (const auto &trailhead : trailheads) {
-    std::vector<Coordinates> reachable_peaks {};
+    std::vector<Coordinates> reachable_peaks{};
     get_reachable_peaks(map, trailhead, reachable_peaks);
-    if (!part_2) remove_repeated_peaks(reachable_peaks);
+    if (!part_2)
+      remove_repeated_peaks(reachable_peaks);
     sum += reachable_peaks.size();
   }
   return sum;
@@ -124,7 +124,7 @@ int main() {
   auto file = open_file(filename);
   const auto file_as_string = file_to_string(file);
   const auto topographic_map = file_as_string_to_map(file_as_string);
-  std::cout << get_sum_of_the_scores_of_all_trailheads(topographic_map) << '\n'; // 709
+  std::cout << get_sum_of_the_scores_of_all_trailheads(topographic_map) << '\n';       // 709
   std::cout << get_sum_of_the_scores_of_all_trailheads(topographic_map, true) << '\n'; // 1326
   return 0;
 }

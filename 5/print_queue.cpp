@@ -1,14 +1,14 @@
-#include <iostream>
-#include <fstream>
 #include <algorithm>
-#include <string_view>
-#include <vector>
-#include <sstream>
 #include <array>
+#include <fstream>
+#include <iostream>
+#include <sstream>
 #include <string>
+#include <string_view>
 #include <utility>
+#include <vector>
 
-static constexpr std::string_view filename {"data.txt"};
+static constexpr std::string_view filename{"data.txt"};
 
 using Rules = std::vector<std::pair<unsigned int, unsigned int>>;
 using Page = std::vector<unsigned int>;
@@ -89,9 +89,9 @@ auto is_preciding_num_in_subpage(const Rules &rules, const Page subpage, const u
 }
 
 auto is_page_in_correct_order(const Page &page, const Rules &rules) {
-  for (auto page_iter = page.begin(); page_iter != page.end(); ++page_iter) {             
+  for (auto page_iter = page.begin(); page_iter != page.end(); ++page_iter) {
     if (std::next(page_iter) != page.end() &&
-      is_preciding_num_in_subpage(rules, Page(std::next(page_iter), page.end()), *page_iter)) {
+        is_preciding_num_in_subpage(rules, Page(std::next(page_iter), page.end()), *page_iter)) {
       return false;
     }
   }
@@ -123,8 +123,8 @@ auto get_number_violating_rules_iter(const Page &page, const Rules &rules, const
 void fix_page_one_part_in_page(Page &page, const Rules &rules) {
   for (auto page_iter = page.begin(); page_iter != page.end(); ++page_iter) {
     if (std::next(page_iter) != page.end() &&
-      is_preciding_num_in_subpage(rules, Page(std::next(page_iter), page.end()), *page_iter)) {
-        auto num_violating_rules_iter = get_number_violating_rules_iter(page, rules, page_iter);
+        is_preciding_num_in_subpage(rules, Page(std::next(page_iter), page.end()), *page_iter)) {
+      auto num_violating_rules_iter = get_number_violating_rules_iter(page, rules, page_iter);
       const auto num_violating_rules = *num_violating_rules_iter;
       page.erase(num_violating_rules_iter);
       page.insert(page_iter, num_violating_rules);
@@ -133,7 +133,7 @@ void fix_page_one_part_in_page(Page &page, const Rules &rules) {
 }
 
 void fix_page(Page &page, const Rules &rules) {
-  while(!is_page_in_correct_order(page, rules)) {
+  while (!is_page_in_correct_order(page, rules)) {
     fix_page_one_part_in_page(page, rules);
   }
 }

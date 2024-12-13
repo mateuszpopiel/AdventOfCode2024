@@ -1,12 +1,12 @@
-#include <iostream>
-#include <fstream>
-#include <string_view>
-#include <vector>
-#include <numeric>
 #include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <numeric>
+#include <string_view>
 #include <unordered_map>
+#include <vector>
 
-static constexpr std::string_view filename {"data.txt"};
+static constexpr std::string_view filename{"data.txt"};
 
 auto open_file(const std::string_view &filename = filename) {
   std::ifstream file(filename.data());
@@ -40,7 +40,9 @@ std::vector<int> rearrange_disk(std::vector<int> &disk_map) {
   rearranged_disk.reserve(rearranged_disk_size);
 
   for (size_t in_disk_map_id = 0; in_disk_map_id < disk_map.size(); in_disk_map_id++) {
-    for (int file_or_free_space_id = 0; file_or_free_space_id < disk_map[in_disk_map_id] && in_disk_map_id < disk_map.size(); file_or_free_space_id++) {
+    for (int file_or_free_space_id = 0;
+         file_or_free_space_id < disk_map[in_disk_map_id] && in_disk_map_id < disk_map.size();
+         file_or_free_space_id++) {
       if (in_disk_map_id % 2 == 0) {
         // Push back file
         rearranged_disk.push_back(in_disk_map_id / 2);
@@ -53,7 +55,8 @@ std::vector<int> rearrange_disk(std::vector<int> &disk_map) {
         back_element--;
         continue;
       }
-      // Free space left but file was fully moved -> continue with the next file by dropping last moved file and last free space
+      // Free space left but file was fully moved -> continue with the next file by dropping last moved file and last
+      // free space
       disk_map.erase(std::prev(disk_map.end(), 2), disk_map.end());
       file_or_free_space_id--; // Counter of free space from the beginning must be kept the same
     }
@@ -65,13 +68,13 @@ std::vector<int> rearrange_disk(std::vector<int> &disk_map) {
 size_t compute_checksum(const std::vector<int> &rearranged_disk) {
   size_t checksum = 0;
   for (size_t i = 0; i < rearranged_disk.size(); i++) {
-    checksum += (rearranged_disk[i]*i);
+    checksum += (rearranged_disk[i] * i);
   }
   return checksum;
 }
 
 size_t get_fitting_file_id(const std::vector<int> &disk_map, const int free_space_length) {
-  for (size_t file_id = disk_map.size() - 1; file_id > 0; file_id-=2) {
+  for (size_t file_id = disk_map.size() - 1; file_id > 0; file_id -= 2) {
     if (disk_map[file_id] <= free_space_length && disk_map[file_id] != 0) {
       return file_id;
     }

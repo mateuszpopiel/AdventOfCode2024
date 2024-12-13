@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.28)
 project(AdventOfCode2024)
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 20) # CI doesn't support C++23 yet
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 add_compile_options(

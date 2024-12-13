@@ -1,14 +1,14 @@
-#include <iostream>
-#include <fstream>
 #include <algorithm>
-#include <string_view>
-#include <vector>
-#include <sstream>
 #include <array>
+#include <fstream>
+#include <iostream>
+#include <sstream>
 #include <string>
+#include <string_view>
 #include <utility>
+#include <vector>
 
-static constexpr std::string_view filename {"data.txt"};
+static constexpr std::string_view filename{"data.txt"};
 
 using LabMap = std::vector<std::string>;
 using Position = std::pair<size_t, size_t>;
@@ -43,48 +43,64 @@ auto find_guards_position(const LabMap &map) {
 
 auto is_leaving_map(const LabMap &map, const Position &guards_position) {
   const auto [i, j] = guards_position;
-  switch (map[i][j])
-  {
-    case '^': return i == 0;
-    case 'v': return i == map.size() - 1;
-    case '<': return j == 0;
-    case '>': return j == map[i].size() - 1;
-    default: std::unreachable();
+  switch (map[i][j]) {
+  case '^':
+    return i == 0;
+  case 'v':
+    return i == map.size() - 1;
+  case '<':
+    return j == 0;
+  case '>':
+    return j == map[i].size() - 1;
+  default:
+    std::unreachable();
   }
 }
 
 auto is_guard_facing_obstacle(const LabMap &map, const Position &guards_position) {
   const auto [i, j] = guards_position;
-  switch (map[i][j])
-  {
-    case '^': return map[i - 1][j] == '#' || map[i - 1][j] == 'O';
-    case 'v': return map[i + 1][j] == '#' || map[i + 1][j] == 'O';
-    case '<': return map[i][j - 1] == '#' || map[i][j - 1] == 'O';
-    case '>': return map[i][j + 1] == '#' || map[i][j + 1] == 'O';
-    default: std::unreachable();
+  switch (map[i][j]) {
+  case '^':
+    return map[i - 1][j] == '#' || map[i - 1][j] == 'O';
+  case 'v':
+    return map[i + 1][j] == '#' || map[i + 1][j] == 'O';
+  case '<':
+    return map[i][j - 1] == '#' || map[i][j - 1] == 'O';
+  case '>':
+    return map[i][j + 1] == '#' || map[i][j + 1] == 'O';
+  default:
+    std::unreachable();
   }
 }
 
 auto turn_right(const char guards_orientation) {
-  switch (guards_orientation)
-  {
-    case '^': return '>';
-    case 'v': return '<';
-    case '<': return '^';
-    case '>': return 'v';
-    default: std::unreachable();
+  switch (guards_orientation) {
+  case '^':
+    return '>';
+  case 'v':
+    return '<';
+  case '<':
+    return '^';
+  case '>':
+    return 'v';
+  default:
+    std::unreachable();
   }
 }
 
 auto move_forward(const Position &position, const char orientation) {
   const auto [i, j] = position;
-  switch (orientation)
-  {
-    case '^': return std::make_pair(i - 1, j);
-    case 'v': return std::make_pair(i + 1, j);
-    case '<': return std::make_pair(i, j - 1);
-    case '>': return std::make_pair(i, j + 1);
-    default: std::unreachable();
+  switch (orientation) {
+  case '^':
+    return std::make_pair(i - 1, j);
+  case 'v':
+    return std::make_pair(i + 1, j);
+  case '<':
+    return std::make_pair(i, j - 1);
+  case '>':
+    return std::make_pair(i, j + 1);
+  default:
+    std::unreachable();
   }
 }
 
@@ -95,19 +111,24 @@ void print_map(const LabMap &map) {
 }
 
 auto get_obstacle_position(const Position &pos, const char orientation) {
-  switch (orientation)
-  {
-    case '^': return std::make_pair(pos.first - 1, pos.second);
-    case 'v': return std::make_pair(pos.first + 1, pos.second);
-    case '<': return std::make_pair(pos.first, pos.second - 1);
-    case '>': return std::make_pair(pos.first, pos.second + 1);
-    default: std::unreachable();
+  switch (orientation) {
+  case '^':
+    return std::make_pair(pos.first - 1, pos.second);
+  case 'v':
+    return std::make_pair(pos.first + 1, pos.second);
+  case '<':
+    return std::make_pair(pos.first, pos.second - 1);
+  case '>':
+    return std::make_pair(pos.first, pos.second + 1);
+  default:
+    std::unreachable();
   }
 }
 
-bool is_loop_detected(const std::vector<std::pair<Position, char>>& path) {
+bool is_loop_detected(const std::vector<std::pair<Position, char>> &path) {
   // Smallest path is 4 steps, smallest loop would be 8, detected on 9th step
-  if (path.size() < 10) return false;
+  if (path.size() < 10)
+    return false;
 
   auto current_state = path.back();
   auto first_visit_it = std::find(path.begin(), path.end() - 1, current_state);
@@ -129,8 +150,7 @@ auto could_add_obstacle(const Position &guard_pos, const LabMap &map) {
   const auto [new_obst_i, new_obst_y] = get_obstacle_position(pos, map_copy[pos.first][pos.second]);
   std::vector<std::pair<Position, char>> path;
   map_copy[new_obst_i][new_obst_y] = 'O';
-  for (auto position = find_guards_position(map_copy);
-       !is_leaving_map(map_copy, position);
+  for (auto position = find_guards_position(map_copy); !is_leaving_map(map_copy, position);
        position = find_guards_position(map_copy)) {
     const auto [i, j] = position;
     path.push_back({position, map_copy[i][j]});
@@ -151,8 +171,7 @@ auto could_add_obstacle(const Position &guard_pos, const LabMap &map) {
 
 auto simulate_guards_movement(LabMap &map) {
   auto num_of_obstacles_to_add = 0;
-  for (auto position = find_guards_position(map);
-       !is_leaving_map(map, position);
+  for (auto position = find_guards_position(map); !is_leaving_map(map, position);
        position = find_guards_position(map)) {
     const auto [i, j] = position;
     if (is_guard_facing_obstacle(map, position)) {

@@ -3,8 +3,8 @@
 long long get_minimum_tokens_to_win(const Machine &machine) {
   const long long press_a_cost = 3;
   const long long press_b_cost = 1;
-  const auto press_b = ((machine.button_a.y * machine.prize.x) - (machine.button_a.x * machine.prize.y))
-    / ((machine.button_a.y*machine.button_b.x) - (machine.button_a.x*machine.button_b.y)); 
+  const auto press_b = ((machine.button_a.y * machine.prize.x) - (machine.button_a.x * machine.prize.y)) /
+                       ((machine.button_a.y * machine.button_b.x) - (machine.button_a.x * machine.button_b.y));
   const auto press_a = (machine.prize.x - (press_b * machine.button_b.x)) / machine.button_a.x;
   if (machine.button_a * press_a + machine.button_b * press_b == machine.prize) {
     return press_a * press_a_cost + press_b * press_b_cost;
@@ -28,6 +28,6 @@ auto solve(const std::string_view filename, const bool part_2) -> size_t {
 
 int main() {
   std::cout << solve("data.txt", false) << '\n'; // 39290
-  std::cout << solve("data.txt", true) << '\n'; // 73458657399094
+  std::cout << solve("data.txt", true) << '\n';  // 73458657399094
   return 0;
 }

@@ -39,7 +39,7 @@ auto get_prize(std::istringstream &iss) -> std::optional<Coordinates> {
 
 auto get_machines(const std::vector<std::string> &input, const bool part_2) -> std::vector<Machine> {
   std::vector<Machine> machines;
-  std::istringstream iss { multiline_string_to_single_line(input) };
+  std::istringstream iss{multiline_string_to_single_line(input)};
   while (iss) {
     Machine machine;
 

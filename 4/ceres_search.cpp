@@ -1,13 +1,13 @@
-#include <iostream>
-#include <fstream>
 #include <algorithm>
+#include <array>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
 #include <string_view>
 #include <vector>
-#include <sstream>
-#include <array>
-#include <string>
 
-static constexpr std::string_view filename {"data.txt"};
+static constexpr std::string_view filename{"data.txt"};
 
 auto open_file(const std::string_view &filename = filename) {
   std::ifstream file(filename.data());
@@ -88,7 +88,8 @@ std::array<std::string, 8> get_all_strings(const std::vector<std::string> &file_
   auto reversed_diagonal_str = reverse_string(diagonal_str);
   auto diagonal_str_other_way = multi_line_string_to_one_line_diagonally_other_way(file_as_str);
   auto reversed_diagonal_str_other_way = reverse_string(diagonal_str_other_way);
-  return {forward_str, backward_str, vertical_str, reversed_vertical_str, diagonal_str, reversed_diagonal_str, diagonal_str_other_way, reversed_diagonal_str_other_way};
+  return {forward_str,  backward_str,          vertical_str,           reversed_vertical_str,
+          diagonal_str, reversed_diagonal_str, diagonal_str_other_way, reversed_diagonal_str_other_way};
 }
 
 auto count_xmas(const std::string &str) {
@@ -108,21 +109,20 @@ auto count_xmas_in_multiple_strings(const std::array<std::string, 8> &strings) {
 }
 
 auto is_x_mas(const std::array<std::array<char, 3>, 3> &lines) {
-  return (lines[0][0] == 'M' && lines[0][2] == 'M' && lines[1][1] == 'A' && lines[2][0] == 'S' && lines[2][2] == 'S')
-  || (lines[0][0] == 'S' && lines[0][2] == 'S' && lines[1][1] == 'A' && lines[2][0] == 'M' && lines[2][2] == 'M')
-  || (lines[0][0] == 'M' && lines[0][2] == 'S' && lines[1][1] == 'A' && lines[2][0] == 'M' && lines[2][2] == 'S')
-  || (lines[0][0] == 'S' && lines[0][2] == 'M' && lines[1][1] == 'A' && lines[2][0] == 'S' && lines[2][2] == 'M');
+  return (lines[0][0] == 'M' && lines[0][2] == 'M' && lines[1][1] == 'A' && lines[2][0] == 'S' && lines[2][2] == 'S') ||
+         (lines[0][0] == 'S' && lines[0][2] == 'S' && lines[1][1] == 'A' && lines[2][0] == 'M' && lines[2][2] == 'M') ||
+         (lines[0][0] == 'M' && lines[0][2] == 'S' && lines[1][1] == 'A' && lines[2][0] == 'M' && lines[2][2] == 'S') ||
+         (lines[0][0] == 'S' && lines[0][2] == 'M' && lines[1][1] == 'A' && lines[2][0] == 'S' && lines[2][2] == 'M');
 }
 
 auto count_x_mas(const std::vector<std::string> &lines) {
   unsigned int count = 0;
   for (auto row_id = 0; row_id < lines.size() - 2; ++row_id) {
     for (auto col_id = 0; col_id < lines[0].size() - 2; ++col_id) {
-      std::array<std::array<char, 3>, 3> subgrid = {{
-        {lines[row_id][col_id], lines[row_id][col_id + 1], lines[row_id][col_id + 2]},
-        {lines[row_id + 1][col_id], lines[row_id + 1][col_id + 1], lines[row_id + 1][col_id + 2]},
-        {lines[row_id + 2][col_id], lines[row_id + 2][col_id + 1], lines[row_id + 2][col_id + 2]}
-      }};
+      std::array<std::array<char, 3>, 3> subgrid = {
+          {{lines[row_id][col_id], lines[row_id][col_id + 1], lines[row_id][col_id + 2]},
+           {lines[row_id + 1][col_id], lines[row_id + 1][col_id + 1], lines[row_id + 1][col_id + 2]},
+           {lines[row_id + 2][col_id], lines[row_id + 2][col_id + 1], lines[row_id + 2][col_id + 2]}}};
       if (is_x_mas(subgrid)) {
         ++count;
       }
