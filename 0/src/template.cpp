@@ -6,7 +6,8 @@
 
 std::vector<std::vector<ull>> get_data(const std::string &filename) {
   auto file = open_file(filename);
-  const auto result = parse_file<ull>(file);
+  // NOLINTNEXTLINE(*no-automatic-move)
+  auto result = parse_file<ull>(file);
   file.close();
   return result;
 }
