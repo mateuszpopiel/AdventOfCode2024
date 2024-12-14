@@ -64,8 +64,8 @@ echo "#include \"$day_theme.hpp\"" > $day_nr/src/main.cpp
 echo "#include <iostream>" >> $day_nr/src/main.cpp
 echo "" >> $day_nr/src/main.cpp
 echo "int main() {" >> $day_nr/src/main.cpp
-echo "  std::cout << \"Result: \" << solve(false) << '\n';" >> $day_nr/src/main.cpp
-echo "  std::cout << \"Result: \" << solve(true) << '\n';" >> $day_nr/src/main.cpp
+echo "  std::cout << solve(false) << '\n';" >> $day_nr/src/main.cpp
+echo "  std::cout << solve(true) << '\n';" >> $day_nr/src/main.cpp
 echo "  return 0;" >> $day_nr/src/main.cpp
 echo "}" >> $day_nr/src/main.cpp
 

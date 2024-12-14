@@ -36,5 +36,5 @@ jobs:
       run: cmake --build --preset "Tests"
 
     - name: Run tests
-      run: ctest --preset "Tests" --verbose
+      run: ctest --preset "Tests"
 
