@@ -46,8 +46,7 @@ echo "#include <vector>" >> $day_nr/src/$day_theme.cpp
 echo "" >> $day_nr/src/$day_theme.cpp
 echo "std::vector<std::vector<ull>> get_data(const std::string &filename) {" >> $day_nr/src/$day_theme.cpp
 echo "  auto file = open_file(filename);" >> $day_nr/src/$day_theme.cpp
-echo "  // NOLINTNEXTLINE(*no-automatic-move)" >> $day_nr/src/$day_theme.cpp
-echo "  const auto result = parse_file<ull>(file);" >> $day_nr/src/$day_theme.cpp
+echo "  auto result = parse_file<ull>(file); // automatic move" >> $day_nr/src/$day_theme.cpp
 echo "  file.close();" >> $day_nr/src/$day_theme.cpp
 echo "  return result;" >> $day_nr/src/$day_theme.cpp
 echo "}" >> $day_nr/src/$day_theme.cpp

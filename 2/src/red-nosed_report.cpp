@@ -10,7 +10,7 @@ using Report = std::vector<Level>;
 
 std::vector<Report> get_reports(const std::string_view &filename) {
   auto file = open_file(filename);
-  const auto reports = parse_file<Level>(file);
+  auto reports = parse_file<Level>(file); // automatic move
   file.close();
   return reports;
 }
