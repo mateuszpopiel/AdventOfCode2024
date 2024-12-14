@@ -1,3 +1,3 @@
 #pragma once
 
-unsigned int solve();
+unsigned int solve(bool part_2);

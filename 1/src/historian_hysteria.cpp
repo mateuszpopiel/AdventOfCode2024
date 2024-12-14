@@ -24,7 +24,19 @@ unsigned int get_total_distance(const std::pair<std::vector<LocationId>, std::ve
   return distance;
 }
 
-unsigned int solve() {
+unsigned int
+get_similarity_score(const std::pair<std::vector<LocationId>, std::vector<LocationId>> &lists_of_locations) {
+  auto left_list = lists_of_locations.first;
+  auto right_list = lists_of_locations.second;
+
+  unsigned int similarity_score = 0;
+  std::for_each(left_list.begin(), left_list.end(), [&](LocationId left) {
+    similarity_score += static_cast<unsigned int>(std::count(right_list.begin(), right_list.end(), left) * left);
+  });
+  return similarity_score;
+}
+
+unsigned int solve(bool part_2) {
   auto file = open_file();
 
   std::vector<LocationId> left_list;
@@ -36,6 +48,8 @@ unsigned int solve() {
     left_list.push_back(left);
     right_list.push_back(right);
   }
-
-  return get_total_distance(std::make_pair(left_list, right_list));
+  if (!part_2) {
+    return get_total_distance(std::make_pair(left_list, right_list));
+  }
+  return get_similarity_score(std::make_pair(left_list, right_list));
 }

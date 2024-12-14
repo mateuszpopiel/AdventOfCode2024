@@ -78,7 +78,7 @@ echo "#include \"$day_theme.hpp\"" > $day_nr/tests/test_day_$day_nr.cpp
 echo "#include <gtest/gtest.h>" >> $day_nr/tests/test_day_$day_nr.cpp
 echo "" >> $day_nr/tests/test_day_$day_nr.cpp
 echo "static constexpr auto example_result = (123u + 456u) * (98u - 76u);" >> $day_nr/tests/test_day_$day_nr.cpp
-echo "TEST(Day15, Part1) { EXPECT_EQ(example_result, solve()); }" >> $day_nr/tests/test_day_$day_nr.cpp
+echo "TEST(Day$day_nr, Part1) { EXPECT_EQ(example_result, solve()); }" >> $day_nr/tests/test_day_$day_nr.cpp
 
 echo "Done! Now you can start solving day $day_nr with theme $day_theme"
 echo "Don't forget to add the new day to the main CMakeLists.txt file"

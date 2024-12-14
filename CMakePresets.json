@@ -7,11 +7,11 @@
   },
   "configurePresets": [
     {
-      "name": "Day 1",
-      "displayName": "Solution for a day 1",
-      "description": "Provided solution for a day 1",
+      "name": "All days",
+      "displayName": "All days",
+      "description": "Build all solutions",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/day_1"
+      "binaryDir": "${sourceDir}/build/all_days"
     },
     {
       "name": "Tests",
@@ -26,9 +26,9 @@
   ],
   "buildPresets": [
     {
-      "name": "Day 1",
-      "configurePreset": "Day 1",
-      "description": "Build solution for a day 1"
+      "name": "All days",
+      "configurePreset": "All days",
+      "description": "Build binaries for all solutions"
     },
     {
       "name": "Tests",

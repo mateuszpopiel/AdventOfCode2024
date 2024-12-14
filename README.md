@@ -61,11 +61,11 @@ Each puzzly consists of 2 parts and for each of them there was a test written us
 cmake --preset Tests && cmake --build --preset Tests && ctest --preset Tests
 ```
 
-To check the solution for the single day one can run the preset specified for the one one would like to check. Example for the day 1 presented below.
+To check the solution for the single day one can first run the preset **"All days"**. It builds binaries for all the solutions. Then one shall go to the binary directory and run it. The `data.txt` file will be already there. The binary simply writes the solution into the standard output. Example for day 1 is presented below.
 
 ```bash
 cmake --preset "Day 1" && cmake --build --preset "Day 1"
-cd build/day_1/1 && ./day_1
+cd build/all_days/1 && ./day_1
 ```
 
 ## Requirements
