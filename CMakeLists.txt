@@ -16,12 +16,6 @@ add_compile_options(
   -fstack-usage
 )
 
-# Set the path to your .clang-tidy file
-set(CLANG_TIDY_FILE ${CMAKE_SOURCE_DIR}/.clang-tidy)
-
-# Configure CMake to use clang-tidy
-set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-config-file=${CLANG_TIDY_FILE}")
-
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(copy_data_file)
 include(day_setup)
@@ -29,7 +23,11 @@ include(day_setup)
 if (ENABLE_TESTS)
   enable_testing()
   find_package(GTest REQUIRED)
+  # Use clang tidy only with test builds
+  set(CLANG_TIDY_FILE ${CMAKE_SOURCE_DIR}/.clang-tidy)
+  set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-config-file=${CLANG_TIDY_FILE}")
 endif()
 
 add_subdirectory(lib)
+add_subdirectory(0)
 add_subdirectory(1)

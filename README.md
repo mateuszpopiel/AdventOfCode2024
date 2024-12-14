@@ -6,24 +6,52 @@ Welcome to the [Advent of Code 2024](https://adventofcode.com/2024) repository! 
 
 Each day's solution is contained within its own directory under the `src` folder. The structure is as follows:
 
-```
+```plaintext
 AdventOfCode2024/
+├── .github/
+├── 0/
 ├── 1/
+├── 2/
+...
+├── cmake/
+│   ├── day_setup_file.cmake
+│   └── ...
+├── lib/
 │   ├── inc/
-|   |    └── theme.hpp
+│   └── src/
+├── .clang-format
+├── .clang-tidy
+├── CMakeLists.txt
+└── CMakePresets.json
+...
+```
+
+- `.github` directory cantains .yml file specifing the CI workflow. For now it is very simle so it requires only that the test build compiles and completes. The clang-tidy is used there so it requires having a brief look on the uploaded solution.
+- `day_setup_file.cmake` contains a simple cmake function that determines how the files of the day are included in the project.
+- `CMakePresets.json` specifies all the configurations used.
+
+## Quick start with a new puzzle
+
+To not waste any moment the `setup_day.sh` bash script was written. It prepares a day specific directory with all the files already there!
+One just needs to run `bash setup_say.sh day_nr day_theme and the directories will be filled as in the example:
+
+```plaintext
+AdventOfCode2024/
+├── day_nr/
+│   ├── inc/
+|   |    └── day_theme.hpp
 │   ├── resources/
 |   |    └── data.txt
 │   ├── src/
-|   |    ├── theme.cpp
+|   |    ├── day_theme.cpp
 |   |    └── main.cpp
 │   └── tests/
-|        └── test_day_1.cpp
+|        └── test_day_day_nr.cpp
 |
 ...
 ```
 
-- `data.txt` contains the puzzle input for the day.
-- `theme.cpp` contains the C++ code to solve the puzzle. Each day has its own name so the team is included here.
+Example code is there as well so it is ready to run and be replaced with an actual puzzle solution
 
 ## Running the Solutions
 
