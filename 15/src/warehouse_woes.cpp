@@ -80,40 +80,18 @@ bool is_box_on_way(const Coordinates &robot, const char direction, const std::un
   return map.at(next_position) == 'O';
 }
 
-void move_box(const Coordinates &box_to_move, const char direction, std::unordered_map<Coordinates, char> &map) {
-  const auto next_box_pos = get_next_position(box_to_move, direction);
-  if (map.find(next_box_pos) == map.end()) {
+void move(const Coordinates &pos, const char direction, std::unordered_map<Coordinates, char> &map) {
+  const auto next_pos = get_next_position(pos, direction);
+  if (map.at(next_pos) == '#') {
     return;
   }
-  if (map.at(next_box_pos) == '#') {
-    return;
+  if (map.at(next_pos) == 'O') {
+    move(next_pos, direction, map);
   }
-  if (map.at(next_box_pos) == 'O') {
-    move_box(next_box_pos, direction, map);
+  if (map.at(next_pos) == '.') {
+    map[next_pos] = 'O';
+    map[pos] = '.';
   }
-  if (map.at(next_box_pos) == '.') {
-    map[next_box_pos] = 'O';
-    map[box_to_move] = '.';
-  }
-}
-
-Coordinates move_robot(const Coordinates &robot, const char direction, std::unordered_map<Coordinates, char> &map) {
-  const auto next_position = get_next_position(robot, direction);
-  if (map.find(next_position) == map.end()) {
-    return robot;
-  }
-  if (map.at(next_position) == '#') {
-    return robot;
-  }
-  if (is_box_on_way(robot, direction, map)) {
-    move_box(next_position, direction, map);
-  }
-  if (is_box_on_way(robot, direction, map)) {
-    return robot;
-  }
-  map[robot] = '.';
-  map[next_position] = '@';
-  return next_position;
 }
 
 Coordinates find_robot(const std::unordered_map<Coordinates, char> &map) {
@@ -127,7 +105,7 @@ Coordinates find_robot(const std::unordered_map<Coordinates, char> &map) {
 void simulate_robot_movement(std::unordered_map<Coordinates, char> &map, const std::string &movement) {
   auto robot = find_robot(map);
   for (const auto &direction : movement) {
-    robot = move_robot(robot, direction, map);
+    move(robot, direction, map);
   }
 }
 
