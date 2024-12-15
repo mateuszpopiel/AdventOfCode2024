@@ -11,7 +11,6 @@ add_compile_options(
   -Wpedantic
   -Wconversion
   -Wsign-conversion
-  -Wno-unused-command-line-argument
   -O3
   -fstack-usage
 )
@@ -33,3 +32,4 @@ add_subdirectory(0)
 add_subdirectory(1)
 add_subdirectory(2)
 add_subdirectory(3)
+add_subdirectory(15)

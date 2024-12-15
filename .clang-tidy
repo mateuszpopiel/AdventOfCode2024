@@ -14,7 +14,11 @@ Checks: >
   -cppcoreguidelines-pro-bounds-pointer-arithmetic,
   -readability-uppercase-literal-suffix,
   -readability-avoid-const-params-in-decls,
-  -readability-identifier-length
+  -readability-identifier-length,
+  -readability-magic-numbers,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -misc-non-private-member-variables-in-classes,
+  -misc-no-recursion,
 
 WarningsAsErrors: '*'
 
