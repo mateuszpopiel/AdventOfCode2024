@@ -1,6 +1,7 @@
 #include "warehouse_woes.hpp"
 #include "file_helpers.hpp"
 #include <algorithm>
+#include <iostream>
 #include <numeric>
 #include <sstream>
 #include <string>
@@ -9,38 +10,85 @@
 #include <vector>
 
 struct Coordinates {
-  ull x;
-  ull y;
+  long x;
+  long y;
 
   bool operator==(const Coordinates &other) const { return x == other.x && y == other.y; }
+  Coordinates operator+(const Coordinates &other) const { return {x + other.x, y + other.y}; }
 };
 
 namespace std {
 template <> struct hash<Coordinates> {
   std::size_t operator()(const Coordinates &coordinates) const {
-    return std::hash<ull>()(coordinates.x) ^ (std::hash<ull>()(coordinates.y) << 1);
+    return std::hash<long>()(coordinates.x) ^ (std::hash<long>()(coordinates.y) << 1);
   }
 };
 } // namespace std
 
-void fill_map_with_line(std::unordered_map<Coordinates, char> &map, const std::string &line, const ull line_nr) {
-  for (ull i = 0; i < line.size(); ++i) {
+static const std::unordered_map<char, Coordinates> movements{
+    {'v', {1, 0}}, {'^', {-1, 0}}, {'>', {0, 1}}, {'<', {0, -1}}};
+
+void print_map(const std::unordered_map<Coordinates, char> &map) {
+  long max_x = 0;
+  long max_y = 0;
+  for (const auto &[coordinates, _] : map) {
+    max_x = std::max(max_x, coordinates.x);
+    max_y = std::max(max_y, coordinates.y);
+  }
+  for (long i = 0; i <= max_x; ++i) {
+    for (long j = 0; j <= max_y; ++j) {
+      if (map.find({i, j}) == map.end()) {
+        std::cout << ' ';
+        continue;
+      }
+      std::cout << map.at({i, j});
+    }
+    std::cout << '\n';
+  }
+}
+
+void fill_map_with_line(std::unordered_map<Coordinates, char> &map, const std::string &line, const long line_nr) {
+  for (auto i = 0u; i < line.size(); ++i) {
     map[{line_nr, i}] = line[i];
   }
 }
 
+void fill_map_with_line_part_2(std::unordered_map<Coordinates, char> &map, const std::string &line,
+                               const long line_nr) {
+  for (auto i = 0u; i < line.size(); ++i) {
+    switch (line[i]) {
+    case '@':
+      map[{line_nr, i * 2u}] = '@';
+      map[{line_nr, i * 2u + 1u}] = '.';
+      break;
+    case 'O':
+      map[{line_nr, i * 2u}] = '[';
+      map[{line_nr, i * 2u + 1u}] = ']';
+      break;
+    case '#':
+      map[{line_nr, i * 2u}] = '#';
+      map[{line_nr, i * 2u + 1u}] = '#';
+      break;
+    case '.':
+      map[{line_nr, i * 2u}] = '.';
+      map[{line_nr, i * 2u + 1u}] = '.';
+      break;
+    }
+  }
+}
+
 std::pair<std::unordered_map<Coordinates, char>, std::string>
-get_map_and_movement_from_file(const std::string &filename) {
+get_map_and_movement_from_file(const std::string &filename, const bool part_2) {
   std::unordered_map<Coordinates, char> map{};
   std::string movement{};
   std::string line{};
   auto file = open_file(filename);
-  for (ull i = 0; std::getline(file, line); ++i) {
+  for (long i = 0; std::getline(file, line); ++i) {
     if (line.empty()) {
       continue;
     }
     if (line[0] == '#') {
-      fill_map_with_line(map, line, i);
+      part_2 ? fill_map_with_line_part_2(map, line, i) : fill_map_with_line(map, line, i);
       continue;
     }
     movement += line;
@@ -51,47 +99,20 @@ get_map_and_movement_from_file(const std::string &filename) {
   return {map, movement};
 }
 
-Coordinates get_next_position(const Coordinates &current_position, const char direction) {
-  Coordinates next_position{current_position};
-  switch (direction) {
-  case 'v':
-    ++next_position.x;
-    break;
-  case '^':
-    --next_position.x;
-    break;
-  case '>':
-    ++next_position.y;
-    break;
-  case '<':
-    --next_position.y;
-    break;
-  default:
-    throw std::runtime_error("Invalid direction");
-  }
-  return next_position;
-}
-
-bool is_box_on_way(const Coordinates &robot, const char direction, const std::unordered_map<Coordinates, char> &map) {
-  const auto next_position = get_next_position(robot, direction);
-  if (map.find(next_position) == map.end()) {
-    return false;
-  }
-  return map.at(next_position) == 'O';
-}
-
-void move(const Coordinates &pos, const char direction, std::unordered_map<Coordinates, char> &map) {
-  const auto next_pos = get_next_position(pos, direction);
+Coordinates move(const Coordinates &pos, const char direction, std::unordered_map<Coordinates, char> &map) {
+  auto next_pos = pos + movements.at(direction);
   if (map.at(next_pos) == '#') {
-    return;
+    return pos;
   }
   if (map.at(next_pos) == 'O') {
     move(next_pos, direction, map);
   }
   if (map.at(next_pos) == '.') {
-    map[next_pos] = 'O';
-    map[pos] = '.';
+    map.at(next_pos) = map.at(pos);
+    map.at(pos) = '.';
+    return next_pos;
   }
+  return pos;
 }
 
 Coordinates find_robot(const std::unordered_map<Coordinates, char> &map) {
@@ -105,13 +126,14 @@ Coordinates find_robot(const std::unordered_map<Coordinates, char> &map) {
 void simulate_robot_movement(std::unordered_map<Coordinates, char> &map, const std::string &movement) {
   auto robot = find_robot(map);
   for (const auto &direction : movement) {
-    move(robot, direction, map);
+    robot = move(robot, direction, map);
   }
 }
 
-ull compute_sum_of_boxes_gps(const std::unordered_map<Coordinates, char> &map) {
-  return std::accumulate(map.begin(), map.end(), 0u, [](const ull sum, const auto &box) {
-    if (box.second != 'O') {
+long compute_sum_of_boxes_gps(const std::unordered_map<Coordinates, char> &map, const bool part_2) {
+  const auto box_char = part_2 ? '[' : 'O';
+  return std::accumulate(map.begin(), map.end(), 0u, [box_char](const long sum, const auto &box) {
+    if (box.second != box_char) {
       return sum;
     }
     return sum + 100u * box.first.x + box.first.y;
@@ -119,10 +141,7 @@ ull compute_sum_of_boxes_gps(const std::unordered_map<Coordinates, char> &map) {
 }
 
 ull solve(const bool part_2) {
-  auto [map, movement] = get_map_and_movement_from_file("data.txt");
+  auto [map, movement] = get_map_and_movement_from_file("data.txt", part_2);
   simulate_robot_movement(map, movement);
-  if (!part_2) {
-    return compute_sum_of_boxes_gps(map);
-  }
-  return 0;
+  return static_cast<ull>(compute_sum_of_boxes_gps(map, part_2));
 }

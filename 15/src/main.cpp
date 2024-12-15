@@ -3,6 +3,6 @@
 
 int main() {
   std::cout << solve(false) << '\n'; // 1568399
-  std::cout << solve(true) << '\n';
+  std::cout << solve(true) << '\n';  // 1575877
   return 0;
 }
