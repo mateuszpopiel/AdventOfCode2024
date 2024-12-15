@@ -14,21 +14,23 @@ void fill_map_with_line_part_2(std::unordered_map<Coordinates<long>, char> &map,
   for (auto i = 0u; i < line.size(); ++i) {
     switch (line[i]) {
     case '@':
-      map[{line_nr, i * 2u}] = '@';
-      map[{line_nr, i * 2u + 1u}] = '.';
+      map[{line_nr, static_cast<long>(i * 2u)}] = '@';
+      map[{line_nr, static_cast<long>(i * 2u + 1u)}] = '.';
       break;
     case 'O':
-      map[{line_nr, i * 2u}] = '[';
-      map[{line_nr, i * 2u + 1u}] = ']';
+      map[{line_nr, static_cast<long>(i * 2u)}] = '[';
+      map[{line_nr, static_cast<long>(i * 2u + 1u)}] = ']';
       break;
     case '#':
-      map[{line_nr, i * 2u}] = '#';
-      map[{line_nr, i * 2u + 1u}] = '#';
+      map[{line_nr, static_cast<long>(i * 2u)}] = '#';
+      map[{line_nr, static_cast<long>(i * 2u + 1u)}] = '#';
       break;
     case '.':
-      map[{line_nr, i * 2u}] = '.';
-      map[{line_nr, i * 2u + 1u}] = '.';
+      map[{line_nr, static_cast<long>(i * 2u)}] = '.';
+      map[{line_nr, static_cast<long>(i * 2u + 1u)}] = '.';
       break;
+    default:
+      throw std::invalid_argument("Invalid character in line: " + line);
     }
   }
 }

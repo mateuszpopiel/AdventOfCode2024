@@ -4,12 +4,7 @@ template <class T> struct Coordinates {
   T x, y;
 
   constexpr Coordinates() : x(0), y(0) {}
-  constexpr Coordinates(const T &x, const T &y) : x(x), y(y) {}
-
-  constexpr Coordinates(const Coordinates &other) = default;
-  constexpr Coordinates(Coordinates &&other) noexcept = default;
-  constexpr Coordinates &operator=(const Coordinates &other) = default;
-  constexpr Coordinates &operator=(Coordinates &&other) noexcept = default;
+  constexpr Coordinates(const T &first, const T &second) : x(first), y(second) {}
 
   constexpr Coordinates operator+(const Coordinates &other) const { return {x + other.x, y + other.y}; }
   constexpr Coordinates operator-(const Coordinates &other) const { return {x - other.x, y - other.y}; }

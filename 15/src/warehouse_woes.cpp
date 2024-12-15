@@ -24,6 +24,8 @@ bool can_move(const std::vector<Coordinates<long>> &positions, const std::unorde
     return map.at(Coordinates<long>{positions.front().x, std::max(positions.front().y, positions.back().y) + 1}) == '.';
   case '<':
     return map.at(Coordinates<long>{positions.front().x, std::min(positions.front().y, positions.back().y) - 1}) == '.';
+  default:
+    throw std::invalid_argument("Invalid direction");
   }
   return false;
 }
