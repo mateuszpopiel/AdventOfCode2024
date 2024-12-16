@@ -18,7 +18,19 @@ static constexpr ull move_cost = 1;
 struct Reindeer {
   Tile position;
   char orientation = '>';
+
+  bool operator==(const Reindeer &other) const {
+    return position == other.position && orientation == other.orientation;
+  }
 };
+
+namespace std {
+template <> struct hash<Reindeer> {
+  std::size_t operator()(const Reindeer &r) const noexcept {
+    return std::hash<long>()(r.position.x) ^ std::hash<long>()(r.position.y) ^ std::hash<char>()(r.orientation);
+  }
+};
+} // namespace std
 
 struct Node {
   Tile position;
@@ -49,10 +61,10 @@ Tile find(const Map &map, const char to_find) {
 
 ull find_smallest_cost_path(const std::unordered_map<Tile, ull> &map, const Reindeer &reindeer, const Tile &end) {
   std::priority_queue<Node, std::vector<Node>, std::greater<>> pq;
-  std::unordered_map<Tile, std::unordered_map<char, ull>> visited;
+  std::unordered_map<Reindeer, ull> visited;
 
   pq.push({reindeer.position, reindeer.orientation, 0});
-  visited[reindeer.position][reindeer.orientation] = 0;
+  visited[reindeer] = 0;
 
   while (!pq.empty()) {
     auto current = pq.top();
@@ -74,8 +86,8 @@ ull find_smallest_cost_path(const std::unordered_map<Tile, ull> &map, const Rein
       // Check if the new position is valid and update cost
       if (map.find(new_position) != map.end()) {
         new_cost += move_cost;
-        if (visited[new_position][dir] == 0 || new_cost < visited[new_position][dir]) {
-          visited[new_position][dir] = new_cost;
+        if (visited[{new_position, dir}] == 0 || new_cost < visited[{new_position, dir}]) {
+          visited[{new_position, dir}] = new_cost;
           pq.push({new_position, dir, new_cost});
         }
       }
@@ -89,8 +101,9 @@ ull solve(const bool part_2) {
   const auto map = get_map("data.txt");
   const auto filtered_map = get_filtered_map_with_costs(map);
   const Reindeer reindeer{find(map, 'S'), '>'};
+  const auto lowest_cost = find_smallest_cost_path(filtered_map, reindeer, find(map, 'E'));
   if (!part_2) {
-    return find_smallest_cost_path(filtered_map, reindeer, find(map, 'E'));
+    return lowest_cost;
   }
-  return find_smallest_cost_path(filtered_map, reindeer, find(map, 'E'));
+  return 0;
 }
