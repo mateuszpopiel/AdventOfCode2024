@@ -4,7 +4,9 @@
 #include <array>
 #include <iostream>
 #include <limits>
+#include <numeric>
 #include <queue>
+#include <stack>
 #include <string>
 #include <vector>
 
@@ -59,51 +61,88 @@ Tile find(const Map &map, const char to_find) {
   return start_iter->first;
 }
 
-ull find_smallest_cost_path(const std::unordered_map<Tile, ull> &map, const Reindeer &reindeer, const Tile &end) {
+std::pair<std::vector<std::vector<Reindeer>>, ull> get_all_paths(const std::unordered_map<Tile, ull> &map,
+                                                                 const Reindeer &reindeer, const Tile &end) {
+  std::vector<std::vector<Reindeer>> all_shortest_paths;
   std::priority_queue<Node, std::vector<Node>, std::greater<>> pq;
   std::unordered_map<Reindeer, ull> visited;
+  std::unordered_map<Reindeer, std::vector<Reindeer>> paths;
 
+  // Initialize the priority queue
   pq.push({reindeer.position, reindeer.orientation, 0});
   visited[reindeer] = 0;
+  paths[reindeer] = {reindeer};
+
+  auto min_cost = std::numeric_limits<ull>::max();
 
   while (!pq.empty()) {
     auto current = pq.top();
     pq.pop();
 
-    if (current.position == end) {
-      return current.cost;
+    auto current_cost = current.cost;
+    Reindeer current_reindeer{current.position, current.orientation};
+
+    if (current_cost > min_cost) {
+      break;
     }
 
-    // Explore next states
+    if (current.position == end) {
+      if (current_cost < min_cost) {
+        all_shortest_paths.clear();
+        min_cost = current_cost;
+      }
+      all_shortest_paths.push_back(paths[current_reindeer]);
+      continue;
+    }
+
     for (const char &dir : orientations) {
-      const ull cost = (dir == current.orientation) ? 0 : turn_cost;
+      const auto cost = (dir == current.orientation) ? move_cost : turn_cost + move_cost;
+      const auto new_position = current.position + moves.at(dir);
+      auto new_cost = current_cost + cost;
 
-      // New orientation and position
-      const auto move = moves.at(dir);
-      const Tile new_position = current.position + move;
-      ull new_cost = current.cost + cost;
+      if (map.find(new_position) == map.end()) {
+        continue;
+      }
 
-      // Check if the new position is valid and update cost
-      if (map.find(new_position) != map.end()) {
-        new_cost += move_cost;
-        if (visited[{new_position, dir}] == 0 || new_cost < visited[{new_position, dir}]) {
-          visited[{new_position, dir}] = new_cost;
-          pq.push({new_position, dir, new_cost});
-        }
+      Reindeer neighbor_reindeer{new_position, dir};
+      if (new_cost <= visited[neighbor_reindeer] || visited[neighbor_reindeer] == 0) {
+        visited[neighbor_reindeer] = new_cost;
+        pq.push({new_position, dir, new_cost});
+
+        paths[neighbor_reindeer] = paths[current_reindeer];
+        paths[neighbor_reindeer].push_back(neighbor_reindeer);
       }
     }
   }
 
-  return std::numeric_limits<ull>::max();
+  return {all_shortest_paths, min_cost};
+}
+
+std::vector<Tile> remove_duplicates(const std::vector<Tile> &tiles) {
+  std::vector<Tile> unique_tiles = tiles;
+  std::sort(unique_tiles.begin(), unique_tiles.end());
+  unique_tiles.erase(std::unique(unique_tiles.begin(), unique_tiles.end()), unique_tiles.end());
+  return unique_tiles;
+}
+
+std::vector<Tile> get_all_tiles_on_optimal_paths(const std::vector<std::vector<Reindeer>> &all_paths) {
+  std::vector<Tile> all_tiles;
+  for (const auto &path : all_paths) {
+    for (const auto &reindeer : path) {
+      all_tiles.push_back(reindeer.position);
+    }
+  }
+  all_tiles = remove_duplicates(all_tiles);
+  return all_tiles;
 }
 
 ull solve(const bool part_2) {
-  const auto map = get_map("data.txt");
+  const auto map = get_map("/home/mateusz/workspace/AdventOfCode2024/16/resources/data.txt");
   const auto filtered_map = get_filtered_map_with_costs(map);
   const Reindeer reindeer{find(map, 'S'), '>'};
-  const auto lowest_cost = find_smallest_cost_path(filtered_map, reindeer, find(map, 'E'));
+  const auto [all_paths, lowest_cost] = get_all_paths(filtered_map, reindeer, find(map, 'E'));
   if (!part_2) {
     return lowest_cost;
   }
-  return 0;
+  return get_all_tiles_on_optimal_paths(all_paths).size();
 }
