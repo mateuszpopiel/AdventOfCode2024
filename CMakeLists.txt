@@ -3,6 +3,7 @@ project(AdventOfCode2024)
 
 set(CMAKE_CXX_STANDARD 20) # CI doesn't support C++23 yet
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 
 add_compile_options(
   -Wall
@@ -33,3 +34,4 @@ add_subdirectory(1)
 add_subdirectory(2)
 add_subdirectory(3)
 add_subdirectory(15)
+add_subdirectory(16)
