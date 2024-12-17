@@ -1,29 +1,15 @@
+#include "ceres_search.hpp"
+#include "file_helpers.hpp"
 #include <algorithm>
 #include <array>
-#include <fstream>
-#include <iostream>
-#include <sstream>
 #include <string>
-#include <string_view>
 #include <vector>
 
-static constexpr std::string_view filename{"data.txt"};
-
-auto open_file(const std::string_view &filename = filename) {
-  std::ifstream file(filename.data());
-  if (!file.is_open()) {
-    throw std::runtime_error("Failed to open file");
-  }
-  return file;
-}
-
-auto file_to_string(std::ifstream &file) {
-  std::string line;
-  std::vector<std::string> lines;
-  while (std::getline(file, line)) {
-    lines.push_back(line);
-  }
-  return lines;
+std::vector<std::vector<ull>> get_data(const std::string &filename) {
+  auto file = open_file(filename);
+  auto result = parse_file<ull>(file); // automatic move
+  file.close();
+  return result;
 }
 
 auto multi_line_string_to_one_line(const std::vector<std::string> &lines) {
@@ -36,7 +22,7 @@ auto multi_line_string_to_one_line(const std::vector<std::string> &lines) {
 
 auto multi_line_string_to_one_line_vertically(const std::vector<std::string> &lines) {
   std::string one_line;
-  for (auto id = 0; id < lines[0].size(); ++id) {
+  for (auto id = 0u; id < lines[0].size(); ++id) {
     for (const auto &line : lines) {
       one_line += line[id];
     }
@@ -47,10 +33,10 @@ auto multi_line_string_to_one_line_vertically(const std::vector<std::string> &li
 
 auto multi_line_string_to_one_line_diagonally(const std::vector<std::string> &lines) {
   std::string one_line;
-  for (int diag_id = 0; diag_id < 2 * lines.size() - 1; ++diag_id) {
-    for (int row_id = 0; row_id < lines.size(); ++row_id) {
-      int col_id = diag_id - row_id;
-      if (col_id >= 0 && col_id < lines.size()) {
+  for (auto diag_id = 0u; diag_id < 2 * lines.size() - 1; ++diag_id) {
+    for (auto row_id = 0u; row_id < lines.size(); ++row_id) {
+      auto col_id = diag_id - row_id;
+      if (col_id < lines.size()) {
         one_line += lines[row_id][col_id];
       }
     }
@@ -61,10 +47,10 @@ auto multi_line_string_to_one_line_diagonally(const std::vector<std::string> &li
 
 auto multi_line_string_to_one_line_diagonally_other_way(const std::vector<std::string> &lines) {
   std::string one_line;
-  for (int diag_id = 0; diag_id < 2 * lines.size() - 1; ++diag_id) {
-    for (int row_id = 0; row_id < lines.size(); ++row_id) {
-      int col_id = lines.size() - 1 - (diag_id - row_id);
-      if (col_id >= 0 && col_id < lines.size()) {
+  for (auto diag_id = 0u; diag_id < 2 * lines.size() - 1; ++diag_id) {
+    for (auto row_id = 0u; row_id < lines.size(); ++row_id) {
+      auto col_id = lines.size() - 1 - (diag_id - row_id);
+      if (col_id < lines.size()) {
         one_line += lines[row_id][col_id];
       }
     }
@@ -93,7 +79,7 @@ std::array<std::string, 8> get_all_strings(const std::vector<std::string> &file_
 }
 
 auto count_xmas(const std::string &str) {
-  unsigned int count = 0;
+  ull count = 0;
   for (auto pos = str.find("XMAS"); pos != std::string::npos; ++count) {
     pos = str.find("XMAS", pos + 4);
   }
@@ -101,7 +87,7 @@ auto count_xmas(const std::string &str) {
 }
 
 auto count_xmas_in_multiple_strings(const std::array<std::string, 8> &strings) {
-  unsigned int count = 0;
+  ull count = 0;
   for (const auto &str : strings) {
     count += count_xmas(str);
   }
@@ -116,10 +102,10 @@ auto is_x_mas(const std::array<std::array<char, 3>, 3> &lines) {
 }
 
 auto count_x_mas(const std::vector<std::string> &lines) {
-  unsigned int count = 0;
-  for (auto row_id = 0; row_id < lines.size() - 2; ++row_id) {
-    for (auto col_id = 0; col_id < lines[0].size() - 2; ++col_id) {
-      std::array<std::array<char, 3>, 3> subgrid = {
+  ull count = 0;
+  for (auto row_id = 0u; row_id < lines.size() - 2; ++row_id) {
+    for (auto col_id = 0u; col_id < lines[0].size() - 2; ++col_id) {
+      const std::array<std::array<char, 3>, 3> subgrid = {
           {{lines[row_id][col_id], lines[row_id][col_id + 1], lines[row_id][col_id + 2]},
            {lines[row_id + 1][col_id], lines[row_id + 1][col_id + 1], lines[row_id + 1][col_id + 2]},
            {lines[row_id + 2][col_id], lines[row_id + 2][col_id + 1], lines[row_id + 2][col_id + 2]}}};
@@ -131,11 +117,11 @@ auto count_x_mas(const std::vector<std::string> &lines) {
   return count;
 }
 
-int main() {
-  auto file = open_file(filename);
-  const auto file_as_str = file_to_string(file);
+ull solve(const bool part_2) {
+  const auto file_as_str = get_input_from_multiline_file("data.txt");
   const auto strings = get_all_strings(file_as_str);
-  std::cout << count_xmas_in_multiple_strings(strings) << '\n';
-  std::cout << count_x_mas(file_as_str) << '\n';
-  return 0;
+  if (!part_2) {
+    return count_xmas_in_multiple_strings(strings);
+  }
+  return count_x_mas(file_as_str);
 }
