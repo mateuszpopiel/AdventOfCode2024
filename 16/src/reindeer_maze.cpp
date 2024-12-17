@@ -127,7 +127,7 @@ ull get_num_of_unique_tiles(const std::vector<std::vector<Tile>> &paths) {
 }
 
 ull solve(const bool part_2) {
-  const auto map = get_map("/home/mateusz/workspace/AdventOfCode2024/16/resources/data.txt");
+  const auto map = get_map("data.txt");
   const auto filtered_map = get_filtered_map_with_costs(map);
   const auto [paths_1, lowest_cost] = find_all_paths_bfs(filtered_map, find(map, 'S'), find(map, 'E'));
   const auto [paths_2, _] = find_all_paths_bfs(filtered_map, find(map, 'E'), find(map, 'S'));

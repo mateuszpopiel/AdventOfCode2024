@@ -74,8 +74,8 @@ void bst(std::array<uint64_t, 3> &registers, const uint8_t operand) {
   registers[1] = get_combo_operand(operand, registers) % 8;
 }
 
-bool jnz(const std::array<uint64_t, 3> &registers, const uint8_t operand, std::vector<uint8_t>::iterator &instr_ptr,
-         const std::vector<uint8_t>::iterator &begin) {
+bool jnz(const std::array<uint64_t, 3> &registers, const uint8_t operand,
+         std::vector<uint8_t>::const_iterator &instr_ptr, const std::vector<uint8_t>::const_iterator &begin) {
   if (registers[0] == 0) {
     return false;
   }
@@ -97,8 +97,10 @@ void cdv(std::array<uint64_t, 3> &registers, const uint8_t operand) {
   registers[2] = registers[0] / (1ull << get_combo_operand(operand, registers));
 }
 
-std::string execute_program(std::pair<std::array<uint64_t, 3>, std::vector<uint8_t>> &data) {
-  auto &[registers, program] = data;
+std::vector<uint8_t> execute_program(const uint64_t a, const std::vector<uint8_t> &program) {
+  const uint64_t b = 0;
+  const uint64_t c = 0;
+  std::array<uint64_t, 3> registers{a, b, c};
   bool jumped = false;
   std::vector<uint8_t> output;
 
@@ -143,13 +145,41 @@ std::string execute_program(std::pair<std::array<uint64_t, 3>, std::vector<uint8
     }
     instr_ptr = std::next(instr_ptr, 2);
   }
-  std::string result_str;
-  std::for_each(output.begin(), output.end(),
-                [&result_str](const uint8_t val) { result_str += std::to_string(val) + ','; });
-  return result_str.substr(0, result_str.size() - 1);
+  return output;
 }
 
-std::string solve(const bool /*part_2*/) {
-  auto program = get_data("/home/mateusz/workspace/AdventOfCode2024/17/resources/data.txt");
-  return execute_program(program);
+uint64_t restore_reg_a(const std::vector<uint8_t> &program, uint64_t a = 0, uint64_t depth = 0) {
+  if (depth == program.size()) {
+    return a;
+  }
+  for (uint8_t i = 0; i < 8; ++i) {
+    const auto output = execute_program(a * 8 + i, program);
+    if (!output.empty() && output.front() == program[program.size() - 1 - depth]) {
+      const auto result = restore_reg_a(program, a * 8 + i, depth + 1);
+      if (result != 0) {
+        return result;
+      }
+    }
+  }
+  return 0;
+}
+
+std::string output_to_string(const std::vector<uint8_t> &output) {
+  std::string output_str;
+  for (size_t i = 0; i < output.size(); ++i) {
+    output_str += std::to_string(output[i]);
+    if (i != output.size() - 1) {
+      output_str += ",";
+    }
+  }
+  return output_str;
+}
+
+std::string solve(const bool part_2) {
+  const auto [registers, program] = get_data("data.txt");
+  if (!part_2) {
+    const auto output = execute_program(registers[0], program);
+    return output_to_string(output);
+  }
+  return std::to_string(restore_reg_a(program));
 }
