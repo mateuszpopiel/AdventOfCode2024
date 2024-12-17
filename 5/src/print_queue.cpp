@@ -1,34 +1,13 @@
+#include "print_queue.hpp"
+#include "file_helpers.hpp"
 #include <algorithm>
 #include <array>
-#include <fstream>
-#include <iostream>
-#include <sstream>
 #include <string>
-#include <string_view>
 #include <utility>
 #include <vector>
 
-static constexpr std::string_view filename{"data.txt"};
-
-using Rules = std::vector<std::pair<unsigned int, unsigned int>>;
-using Page = std::vector<unsigned int>;
-
-auto open_file(const std::string_view &filename = filename) {
-  std::ifstream file(filename.data());
-  if (!file.is_open()) {
-    throw std::runtime_error("Failed to open file");
-  }
-  return file;
-}
-
-auto file_to_string(std::ifstream &file) {
-  std::string line;
-  std::vector<std::string> lines;
-  while (std::getline(file, line)) {
-    lines.push_back(line);
-  }
-  return lines;
-}
+using Rules = std::vector<std::pair<ull, ull>>;
+using Page = std::vector<ull>;
 
 auto multi_line_string_to_one_line(const std::vector<std::string> &lines) {
   std::string one_line;
@@ -45,16 +24,19 @@ auto get_rules(const std::vector<std::string> &file_as_str) {
       auto mutable_line = line;
       std::replace(mutable_line.begin(), mutable_line.end(), '|', ' ');
       std::istringstream iss(mutable_line);
-      unsigned int first, second;
+      ull first = 0;
+      ull second = 0;
       iss >> first >> second;
-      rules.push_back({first, second});
+      rules.emplace_back(std::make_pair(first, second));
     }
   }
   return rules;
 }
 
 auto get_pages(const std::vector<std::string> &file_as_str, const size_t line_to_start) {
-  auto pages_str = std::vector<std::string>(file_as_str.begin() + line_to_start, file_as_str.end());
+  auto pages_str = std::vector<std::string>(
+      std::next(file_as_str.begin(), static_cast<std::vector<std::string>::difference_type>(line_to_start)),
+      file_as_str.end());
   std::vector<Page> pages;
   for (const auto &page_str : pages_str) {
     Page page;
@@ -68,8 +50,8 @@ auto get_pages(const std::vector<std::string> &file_as_str, const size_t line_to
   return pages;
 }
 
-auto get_numbers_preciding_number(const Rules &rules, const unsigned int number) {
-  std::vector<unsigned int> numbers_before_the_number;
+auto get_numbers_preciding_number(const Rules &rules, const ull number) {
+  std::vector<ull> numbers_before_the_number;
   for (const auto &rule : rules) {
     if (rule.second == number) {
       numbers_before_the_number.push_back(rule.first);
@@ -78,14 +60,12 @@ auto get_numbers_preciding_number(const Rules &rules, const unsigned int number)
   return numbers_before_the_number;
 }
 
-auto is_preciding_num_in_subpage(const Rules &rules, const Page subpage, const unsigned int number) {
+auto is_preciding_num_in_subpage(const Rules &rules, const Page &subpage, const ull number) {
   const auto numbers_preciding_number = get_numbers_preciding_number(rules, number);
-  for (const auto &number_before : numbers_preciding_number) {
-    if (std::find(subpage.begin(), subpage.end(), number_before) != subpage.end()) {
-      return true;
-    }
-  }
-  return false;
+  return std::any_of(subpage.begin(), subpage.end(), [&numbers_preciding_number](const auto &number_before) {
+    return std::find(numbers_preciding_number.begin(), numbers_preciding_number.end(), number_before) !=
+           numbers_preciding_number.end();
+  });
 }
 
 auto is_page_in_correct_order(const Page &page, const Rules &rules) {
@@ -99,7 +79,7 @@ auto is_page_in_correct_order(const Page &page, const Rules &rules) {
 }
 
 auto get_sum_of_nums_in_the_middle_of_valid_pages(const std::vector<Page> &pages, const Rules &rules) {
-  unsigned int sum = 0;
+  ull sum = 0;
   for (const auto &page : pages) {
     if (!is_page_in_correct_order(page, rules)) {
       continue;
@@ -150,20 +130,12 @@ auto fix_pages(const std::vector<Page> &pages, const Rules &rules) {
   return fixed_pages;
 }
 
-int main() {
-  auto file = open_file(filename);
-  const auto file_as_str = file_to_string(file);
+ull solve(const bool part_2) {
+  const auto file_as_str = get_input_from_multiline_file("data.txt");
   const auto rules = get_rules(file_as_str);
-  const auto pages = get_pages(file_as_str, rules.size() + 1); // There is empty line in file
-
-  // Part 1
-  const auto sum = get_sum_of_nums_in_the_middle_of_valid_pages(pages, rules);
-  std::cout << "Sum: " << sum << std::endl;
-
-  // Part 2
-  const auto fixed_pages = fix_pages(pages, rules);
-  const auto sum_fixed = get_sum_of_nums_in_the_middle_of_valid_pages(fixed_pages, rules);
-  std::cout << "Sum fixed: " << sum_fixed << std::endl;
-
-  return 0;
+  auto pages = get_pages(file_as_str, rules.size() + 1); // There is empty line in file
+  if (part_2) {
+    pages = fix_pages(pages, rules);
+  }
+  return get_sum_of_nums_in_the_middle_of_valid_pages(pages, rules);
 }
