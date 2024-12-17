@@ -1,13 +1,14 @@
+#include "claw_contraption.hpp"
 #include "str_to_machine_helper.hpp"
 
-long long get_minimum_tokens_to_win(const Machine &machine) {
+auto get_minimum_tokens_to_win(const Machine &machine) -> size_t {
   const long long press_a_cost = 3;
   const long long press_b_cost = 1;
   const auto press_b = ((machine.button_a.y * machine.prize.x) - (machine.button_a.x * machine.prize.y)) /
                        ((machine.button_a.y * machine.button_b.x) - (machine.button_a.x * machine.button_b.y));
   const auto press_a = (machine.prize.x - (press_b * machine.button_b.x)) / machine.button_a.x;
   if (machine.button_a * press_a + machine.button_b * press_b == machine.prize) {
-    return press_a * press_a_cost + press_b * press_b_cost;
+    return static_cast<size_t>(press_a * press_a_cost + press_b * press_b_cost);
   }
   return 0;
 }
@@ -26,8 +27,8 @@ auto solve(const std::string_view filename, const bool part_2) -> size_t {
   return get_minimum_tokens_to_win_all_prizes(machines);
 }
 
-int main() {
-  std::cout << solve("data.txt", false) << '\n'; // 39290
-  std::cout << solve("data.txt", true) << '\n';  // 73458657399094
-  return 0;
+auto solve(const bool part_2) -> ull {
+  const auto input = get_input_from_multiline_file("data.txt");
+  const auto machines = get_machines(input, part_2);
+  return static_cast<ull>(get_minimum_tokens_to_win_all_prizes(machines));
 }

@@ -2,9 +2,11 @@
 
 inline constexpr long long unit_conversion_shift = 10'000'000'000'000;
 
-auto get_button(std::istringstream &iss) -> std::optional<Coordinates> {
-  std::string temp, x, y;
-  Coordinates button;
+auto get_button(std::istringstream &iss) -> std::optional<Coordinates<long long>> {
+  std::string temp;
+  std::string x;
+  std::string y;
+  Coordinates<long long> button;
 
   //     Button  A:     X+94, Y+34
   iss >> temp >> temp >> x >> y;
@@ -20,9 +22,11 @@ auto get_button(std::istringstream &iss) -> std::optional<Coordinates> {
   return button;
 }
 
-auto get_prize(std::istringstream &iss) -> std::optional<Coordinates> {
-  std::string temp, x, y;
-  Coordinates prize;
+auto get_prize(std::istringstream &iss) -> std::optional<Coordinates<long long>> {
+  std::string temp;
+  std::string x;
+  std::string y;
+  Coordinates<long long> prize;
 
   //    Prize:  X=8, Y=54
   iss >> temp >> x >> y;
