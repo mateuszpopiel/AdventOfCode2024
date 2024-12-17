@@ -1,4 +1,4 @@
-#include "../lib/inc/file_helpers.hpp"
+#include "file_helpers.hpp"
 #include <iostream>
 #include <optional>
 #include <sstream>

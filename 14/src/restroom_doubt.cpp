@@ -1,25 +1,22 @@
+#include "restroom_doubt.hpp"
+#include "coordinates.hpp"
 #include "file_helpers.hpp"
 #include <algorithm>
-#include <iostream>
 #include <numeric>
 #include <unordered_map>
 #include <vector>
 
-struct Coordinates {
-  long x;
-  long y;
-};
-
 struct Robot {
-  Coordinates position;
-  Coordinates velocity;
+  Coordinates<long long> position;
+  Coordinates<long long> velocity;
 };
 
-static constexpr Coordinates world_size = {101, 103};
+static constexpr Coordinates<long long> world_size = {101, 103};
 
 Robot get_robot_from_string(const std::string &robot_str) {
   Robot robot;
-  sscanf(robot_str.c_str(), "p=%ld,%ld v=%ld,%ld", &robot.position.x, &robot.position.y, &robot.velocity.x,
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
+  sscanf(robot_str.c_str(), "p=%lld,%lld v=%lld,%lld", &robot.position.x, &robot.position.y, &robot.velocity.x,
          &robot.velocity.y);
   return robot;
 }
@@ -51,8 +48,8 @@ void simulate_one_sec(std::vector<Robot> &robots) {
   }
 }
 
-Coordinates get_quadrant_begin(const Coordinates &world_size, const unsigned int quadrant_number) {
-  Coordinates quadrant_begin;
+Coordinates<long long> get_quadrant_begin(const Coordinates<long long> &world_size, const ull quadrant_number) {
+  Coordinates<long long> quadrant_begin;
   switch (quadrant_number) {
   case 1:
     quadrant_begin = {0, 0};
@@ -72,8 +69,8 @@ Coordinates get_quadrant_begin(const Coordinates &world_size, const unsigned int
   return quadrant_begin;
 }
 
-Coordinates get_quadrant_end(const Coordinates &world_size, const unsigned int quadrant_number) {
-  Coordinates quadrant_end;
+Coordinates<long long> get_quadrant_end(const Coordinates<long long> &world_size, const ull quadrant_number) {
+  Coordinates<long long> quadrant_end;
   switch (quadrant_number) {
   case 1:
     quadrant_end = {world_size.x / 2, world_size.y / 2};
@@ -93,14 +90,14 @@ Coordinates get_quadrant_end(const Coordinates &world_size, const unsigned int q
   return quadrant_end;
 }
 
-std::unordered_map<unsigned int, size_t> get_number_of_robots_in_quadrants(const std::vector<Robot> &robots) {
-  std::vector<std::pair<Coordinates, Coordinates>> quadrants;
-  for (unsigned int i = 1; i <= 4; ++i) {
-    quadrants.push_back({get_quadrant_begin(world_size, i), get_quadrant_end(world_size, i)});
+std::unordered_map<ull, size_t> get_number_of_robots_in_quadrants(const std::vector<Robot> &robots) {
+  std::vector<std::pair<Coordinates<long long>, Coordinates<long long>>> quadrants;
+  for (ull i = 1; i <= 4; ++i) {
+    quadrants.emplace_back(get_quadrant_begin(world_size, i), get_quadrant_end(world_size, i));
   }
-  std::unordered_map<unsigned int, size_t> robots_in_quadrants;
+  std::unordered_map<ull, size_t> robots_in_quadrants;
   for (const auto &robot : robots) {
-    for (unsigned int i = 1; i < 5; ++i) {
+    for (ull i = 1; i < 5; ++i) {
       const auto &quadrant = quadrants[i - 1];
       if (robot.position.x >= quadrant.first.x && robot.position.x < quadrant.second.x &&
           robot.position.y >= quadrant.first.y && robot.position.y < quadrant.second.y) {
@@ -112,22 +109,21 @@ std::unordered_map<unsigned int, size_t> get_number_of_robots_in_quadrants(const
   return robots_in_quadrants;
 }
 
-unsigned int solve_part_1() {
+ull solve_part_1() {
   static constexpr auto time_to_simulate = 100u; // seconds
   auto robots = get_robots_from_file("data.txt");
   for (auto i = 0u; i < time_to_simulate; ++i) {
     simulate_one_sec(robots);
   }
   const auto robots_in_quadrants = get_number_of_robots_in_quadrants(robots);
-  return std::accumulate(
-      robots_in_quadrants.begin(), robots_in_quadrants.end(), 1u,
-      [](unsigned int acc, const auto &robot_in_quadrant) { return acc * robot_in_quadrant.second; });
+  return std::accumulate(robots_in_quadrants.begin(), robots_in_quadrants.end(), 1u,
+                         [](ull acc, const auto &robot_in_quadrant) { return acc * robot_in_quadrant.second; });
 }
 
-bool are_robots_aliged_horizontally(const std::vector<Robot> &robots, const unsigned int aligned_robots,
-                                    const unsigned int times) {
+// NOLINTNEXTLINE(*-easily-swappable-parameters)
+bool are_robots_aliged_horizontally(const std::vector<Robot> &robots, const ull aligned_robots, const ull times) {
   auto robots_aligned = 0u;
-  for (auto i = 0; i < world_size.x; ++i) {
+  for (auto i = 0u; i < world_size.x; ++i) {
     std::vector<Robot> robots_in_the_same_line;
     std::copy_if(robots.begin(), robots.end(), std::back_inserter(robots_in_the_same_line),
                  [i](const auto &robot) { return robot.position.x == i; });
@@ -152,10 +148,10 @@ bool are_robots_aliged_horizontally(const std::vector<Robot> &robots, const unsi
   return false;
 }
 
-bool are_robots_aliged_vertically(const std::vector<Robot> &robots, const unsigned int aligned_robots,
-                                  const unsigned int times) {
+// NOLINTNEXTLINE(*-easily-swappable-parameters)
+bool are_robots_aliged_vertically(const std::vector<Robot> &robots, const ull aligned_robots, const ull times) {
   auto robots_aligned = 0u;
-  for (auto i = 0; i < world_size.y; ++i) {
+  for (auto i = 0u; i < world_size.y; ++i) {
     std::vector<Robot> robots_in_the_same_line;
     std::copy_if(robots.begin(), robots.end(), std::back_inserter(robots_in_the_same_line),
                  [i](const auto &robot) { return robot.position.y == i; });
@@ -185,7 +181,7 @@ bool are_robots_in_christmas_tree(const std::vector<Robot> &robots) {
   return are_robots_aliged_horizontally(robots, 20, 3) && are_robots_aliged_vertically(robots, 20, 3);
 }
 
-unsigned int solve_part_2() {
+ull solve_part_2() {
   static constexpr auto time_to_simulate = 10'000u; // seconds
   auto robots = get_robots_from_file("data.txt");
   for (auto i = 1u; i < time_to_simulate; ++i) {
@@ -197,8 +193,9 @@ unsigned int solve_part_2() {
   return time_to_simulate;
 }
 
-int main() {
-  std::cout << solve_part_1() << '\n'; // 217132650
-  std::cout << solve_part_2() << '\n'; // 6516
-  return 0;
+ull solve(const bool part_2) {
+  if (!part_2) {
+    return solve_part_1();
+  }
+  return solve_part_2();
 }
