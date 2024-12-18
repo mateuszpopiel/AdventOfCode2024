@@ -22,13 +22,13 @@ auto get_minimum_tokens_to_win_all_prizes(const std::vector<Machine> &machines) 
 }
 
 auto solve(const std::string_view filename, const bool part_2) -> size_t {
-  const auto input = get_input_from_multiline_file(filename);
+  const auto input = file_to_string(filename);
   const auto machines = get_machines(input, part_2);
   return get_minimum_tokens_to_win_all_prizes(machines);
 }
 
 auto solve(const bool part_2) -> ull {
-  const auto input = get_input_from_multiline_file("data.txt");
+  const auto input = file_to_string("data.txt");
   const auto machines = get_machines(input, part_2);
   return static_cast<ull>(get_minimum_tokens_to_win_all_prizes(machines));
 }

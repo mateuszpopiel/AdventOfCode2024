@@ -30,7 +30,7 @@ struct Node {
 };
 
 std::vector<Coordinates<int8_t>> get_data(const std::string &filename, const uint16_t bytes_to_simulate) {
-  auto file_str = get_input_from_multiline_file(filename);
+  auto file_str = file_to_string(filename);
   std::vector<Coordinates<int8_t>> result;
   for (auto &line : file_str) {
     std::replace(line.begin(), line.end(), ',', ' ');

@@ -131,7 +131,7 @@ auto fix_pages(const std::vector<Page> &pages, const Rules &rules) {
 }
 
 ull solve(const bool part_2) {
-  const auto file_as_str = get_input_from_multiline_file("data.txt");
+  const auto file_as_str = file_to_string("data.txt");
   const auto rules = get_rules(file_as_str);
   auto pages = get_pages(file_as_str, rules.size() + 1); // There is empty line in file
   if (part_2) {

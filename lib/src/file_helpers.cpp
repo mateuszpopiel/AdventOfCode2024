@@ -14,7 +14,7 @@ auto open_file(const std::string_view &filename) -> std::ifstream {
   return file;
 }
 
-auto file_to_string(std::ifstream &file) -> std::vector<std::string> {
+auto ifstream_file_to_string(std::ifstream &file) -> std::vector<std::string> {
   std::string line;
   std::vector<std::string> lines;
   while (std::getline(file, line)) {
@@ -23,9 +23,9 @@ auto file_to_string(std::ifstream &file) -> std::vector<std::string> {
   return lines;
 }
 
-auto get_input_from_multiline_file(const std::string_view &filename) -> std::vector<std::string> {
+auto file_to_string(const std::string_view &filename) -> std::vector<std::string> {
   auto file = open_file(filename);
-  auto lines = file_to_string(file);
+  auto lines = ifstream_file_to_string(file);
   file.close();
   return lines;
 }

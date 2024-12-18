@@ -118,7 +118,7 @@ auto count_x_mas(const std::vector<std::string> &lines) {
 }
 
 ull solve(const bool part_2) {
-  const auto file_as_str = get_input_from_multiline_file("data.txt");
+  const auto file_as_str = file_to_string("data.txt");
   const auto strings = get_all_strings(file_as_str);
   if (!part_2) {
     return count_xmas_in_multiple_strings(strings);

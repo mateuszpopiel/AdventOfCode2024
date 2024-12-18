@@ -31,7 +31,7 @@ std::vector<Robot> get_robots(const std::vector<std::string> &robots_str) {
 }
 
 std::vector<Robot> get_robots_from_file(const std::string_view &filename) {
-  const auto robots_str = get_input_from_multiline_file(filename);
+  const auto robots_str = file_to_string(filename);
   return get_robots(robots_str);
 }
 
