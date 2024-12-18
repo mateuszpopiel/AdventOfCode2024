@@ -2,7 +2,8 @@
 #include <iostream>
 
 int main() {
-  std::cout << solve(false) << '\n';
-  // std::cout << solve(true) << '\n';
+  const auto part_1_solution = solve(false);
+  std::cout << std::get<ull>(part_1_solution) << '\n';
+  std::cout << std::get<std::string>(solve(true)) << '\n';
   return 0;
 }

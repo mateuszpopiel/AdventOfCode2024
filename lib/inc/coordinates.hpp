@@ -1,5 +1,6 @@
 #pragma once
 #include <functional>
+#include <string>
 
 template <class T> struct Coordinates {
   T x, y;
@@ -24,6 +25,8 @@ template <class T> struct Coordinates {
   constexpr bool operator>(const Coordinates &other) const { return other < *this; }
   constexpr bool operator<=(const Coordinates &other) const { return !(*this > other); }
   constexpr bool operator>=(const Coordinates &other) const { return !(*this < other); }
+
+  [[nodiscard]] std::string to_string() const { return std::to_string(x) + "," + std::to_string(y); }
 };
 
 namespace std {
