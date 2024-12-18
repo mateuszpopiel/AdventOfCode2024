@@ -8,8 +8,6 @@
 #include <utility>
 #include <vector>
 
-// TODO: REFACTOR REQUIRED, part 2 takes ~13s
-
 using DataType = unsigned long long;
 using Permutation = std::vector<std::string>;
 
