@@ -1,6 +1,7 @@
 #include "ram_run.hpp"
 #include "coordinates.hpp"
 #include "file_helpers.hpp"
+#include <algorithm>
 #include <cstdint>
 #include <fstream>
 #include <functional>
