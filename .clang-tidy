@@ -10,6 +10,7 @@ Checks: >
   misc-*,
   -misc-include-cleaner,
   -modernize-use-trailing-return-type,
+  -bugprone-easily-swappable-parameters,
   -cppcoreguidelines-pro-type-reinterpret-cast,
   -cppcoreguidelines-pro-bounds-pointer-arithmetic,
   -readability-uppercase-literal-suffix,
