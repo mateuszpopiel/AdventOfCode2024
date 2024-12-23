@@ -1,3 +1,5 @@
 #pragma once
 #include <cstdint>
-uint64_t solve(const bool part_2);
+#include <string>
+#include <variant>
+std::variant<uint64_t, std::string> solve(const bool part_2);
