@@ -47,7 +47,6 @@ add_subdirectory(12)
 add_subdirectory(13)
 add_subdirectory(14)
 add_subdirectory(15)
-# TODO: Likely day 16 could have been done better
 add_subdirectory(16)
 add_subdirectory(17)
 add_subdirectory(18)
